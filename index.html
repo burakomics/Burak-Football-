@@ -1,368 +1,522 @@
-
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Burak Cloud Wonder Box</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Burak Football Performance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Layout: app shell. Dark sidebar (products + sections), sticky top bar, content area of panels. One section visible at a time. */
+/* Layout: fixed left nav + scrolling workspace; squad first, then a player drill-down. */
 :root{
-  --bg:#EFF4F5; --panel:#FFFFFF; --panel2:#F5F8F9; --ink:#10232A; --ink2:#4B6168; --ink3:#7B8E93; --line:#DCE5E7;
-  --accent:#0E7C86; --accent-ink:#FFFFFF; --saffron:#B4720C; --good:#2B8253; --warn:#B0731A; --crit:#BC3A2E; --blue:#3567C4; --violet:#6F5BC9;
-  --side:#0B262C; --side-ink:#CFE0E3; --side-ink2:#7FA3A9; --side-hi:#143B43;
-  --f-display:"Plus Jakarta Sans","Inter",system-ui,sans-serif; --f-body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
-  --sh:0 1px 2px rgba(16,40,48,.05),0 10px 26px -18px rgba(16,40,48,.25);
+  --bg:#f3f6f4;--card:#ffffff;--ink:#10231d;--muted:#5b6f68;--line:#dfe8e3;
+  --pitch:#0d3b2e;--pitch2:#145442;--accent:#18a77a;--accent-ink:#0b6b4e;--chalk:#eaf5ef;
+  --ok:#1f9d6a;--watch:#d39b0c;--review:#e0523d;--medical:#8f1d2c;--na:#9aa9a3;
+  --l-muscle:#e0523d;--l-inflam:#e07a1f;--l-immune:#8b5cf6;--l-endo:#0ea5a4;--l-oxy:#be2a5a;--l-hydr:#2f7fd6;--l-energy:#c99a06;--l-bone:#6b7280;
+  --display:'Space Grotesk',Arial,sans-serif;--body:'Inter',Arial,sans-serif;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0A1316; --panel:#111D21; --panel2:#16252A; --ink:#E2ECEE; --ink2:#9DB1B6; --ink3:#6E848A; --line:#22353B;
-  --accent:#4BC0C9; --accent-ink:#04181B; --saffron:#E5A445; --good:#57BC82; --warn:#E2A54B; --crit:#E8705F; --blue:#7DA0EA; --violet:#A796EC;
-  --side:#071619; --side-ink:#C6D8DB; --side-ink2:#6D9097; --side-hi:#10313A; color-scheme:dark }}
-:root[data-theme="dark"]{
-  --bg:#0A1316; --panel:#111D21; --panel2:#16252A; --ink:#E2ECEE; --ink2:#9DB1B6; --ink3:#6E848A; --line:#22353B;
-  --accent:#4BC0C9; --accent-ink:#04181B; --saffron:#E5A445; --good:#57BC82; --warn:#E2A54B; --crit:#E8705F; --blue:#7DA0EA; --violet:#A796EC;
-  --side:#071619; --side-ink:#C6D8DB; --side-ink2:#6D9097; --side-hi:#10313A; color-scheme:dark }
 *{box-sizing:border-box}
-html,body{height:100%}
-body{background:var(--bg);color:var(--ink);font:14.5px/1.55 var(--f-body);font-feature-settings:"cv11","ss01";-webkit-font-smoothing:antialiased}
-h1,h2,h3,h4{font-family:var(--f-display);letter-spacing:-.02em;margin:0;text-wrap:balance}
-button{font:inherit;color:inherit;cursor:pointer}
-button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.mono{font-family:var(--f-mono);font-size:.92em;letter-spacing:-.01em}
-.num{font-variant-numeric:tabular-nums}
-.app{display:grid;grid-template-columns:236px minmax(0,1fr);min-height:100%}
-/* sidebar */
-.side{background:var(--side);color:var(--side-ink);padding:18px 12px;display:flex;flex-direction:column;gap:16px;position:sticky;top:0;height:100vh;overflow:auto}
-.brand{display:flex;align-items:center;gap:10px;padding:2px 6px}
-.logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(140deg,#2FB6C2,#0A5560);display:grid;place-items:center;flex:none}
-.brand b{font:800 18px/1 var(--f-display);color:#fff;letter-spacing:-.02em}
-.brand b span{color:#F0B03E}
-.brand small{display:block;font-size:11px;color:var(--side-ink2);margin-top:3px}
-.sec{font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--side-ink2);padding:0 8px;margin-bottom:-8px}
-.prods,.navs{display:flex;flex-direction:column;gap:2px}
-.prod,.nav{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:0;background:none;text-align:left;color:var(--side-ink);width:100%}
-.prod:hover,.nav:hover{background:var(--side-hi)}
-.prod i{width:8px;height:8px;border-radius:50%;flex:none}
-.prod small{margin-left:auto;font-size:10.5px;color:var(--side-ink2)}
-.prod[aria-current="true"],.nav[aria-current="page"]{background:linear-gradient(90deg,color-mix(in srgb,#2FB6C2 30%,var(--side-hi)),var(--side-hi));color:#fff}
-.nav svg{width:16px;height:16px;flex:none}
-.nav .ct{margin-left:auto;font-size:11px;padding:1px 7px;border-radius:99px;background:rgba(255,255,255,.1)}
-.nav .ct.hot{background:#E8705F;color:#fff}
-.sidefoot{margin-top:auto;font-size:11.5px;color:var(--side-ink2);padding:0 8px;line-height:1.5}
-/* main */
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.45}
+h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.01em;text-wrap:balance}
+button{font:inherit}
+.app{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh}
+.side{background:var(--pitch);color:#d9ece4;padding:18px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:18px}
+.brand{display:flex;gap:10px;align-items:center}
+.brand .mk{width:34px;height:34px;border-radius:9px;background:var(--accent);display:grid;place-items:center;color:#062b20;font:700 16px var(--display)}
+.brand b{display:block;font:700 16px var(--display);color:#fff}.brand span{font-size:11.5px;color:#9cc7b6}
+.nav{display:flex;flex-direction:column;gap:3px}
+.nav .lab{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#7fae9c;margin:10px 8px 4px}
+.nav button{all:unset;cursor:pointer;padding:9px 10px;border-radius:8px;color:#d9ece4;font-weight:500;display:flex;gap:9px;align-items:center}
+.nav button:hover{background:rgba(255,255,255,.06)}
+.nav button[aria-current="page"]{background:var(--pitch2);color:#fff;box-shadow:inset 3px 0 0 var(--accent)}
+.nav button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.side .foot{margin-top:auto;font-size:11.5px;color:#8fb8a8;border-top:1px solid rgba(255,255,255,.1);padding-top:12px}
 .main{min-width:0;display:flex;flex-direction:column}
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:12px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
-.crumb{font-size:13px;color:var(--ink2);flex:1;min-width:0}
-.crumb b{color:var(--ink)}
-.chip{font:500 11.5px var(--f-mono);padding:5px 10px;border-radius:99px;border:1px solid var(--line);background:var(--panel);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 0 3px color-mix(in srgb,var(--good) 25%,transparent)}
-.btn{border:1px solid var(--line);background:var(--panel);border-radius:9px;padding:7px 13px;font-weight:600;font-size:13px}
-.btn:hover{border-color:var(--accent);color:var(--accent)}
-.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.btn.pri:hover{filter:brightness(1.05);color:var(--accent-ink)}
-.content{padding-block:22px 40px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px;max-width:1320px;width:100%}
-.ph{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap}
-.ph .eb{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
-.ph h1{font-size:27px;font-weight:800;margin-top:3px}
-.ph p{margin:4px 0 0;color:var(--ink2);max-width:720px}
-.sim{font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:99px;background:color-mix(in srgb,var(--saffron) 15%,transparent);color:var(--saffron)}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:var(--sh);min-width:0}
-.panel>h3{font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:8px}
-.panel>h3::before{content:"";width:4px;height:15px;border-radius:3px;background:linear-gradient(var(--accent),var(--saffron))}
-.panel .sub{font-size:12.5px;color:var(--ink2);margin:2px 0 12px}
+.poc{background:#fff6dd;border-bottom:1px solid #f0dca0;color:#6b4e00;font-size:12.5px;padding:7px 24px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.poc b{background:#f5c94a;color:#3d2c00;border-radius:4px;padding:1px 7px;font-size:11px;letter-spacing:.04em}
+.linkbtn{all:unset;cursor:pointer;color:#0b6b4e;font-weight:600;margin-left:auto}
+.top{padding:22px 24px 6px;display:flex;justify-content:space-between;gap:16px;align-items:flex-end;flex-wrap:wrap}
+.top h1{font-size:24px}.top p{margin:3px 0 0;color:var(--muted)}
+.chip-ws{background:var(--chalk);border:1px solid #c6e6d6;color:var(--accent-ink);font-weight:600;font-size:12px;border-radius:8px;padding:5px 10px}
+.view{padding:12px 24px 40px;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;min-width:0}
+.card h3{font-size:15px}.card .sub{color:var(--muted);font-size:12.5px;margin-top:2px}
 .grid{display:grid;gap:16px}
-.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
-.g3{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
-.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
-.kpi{position:relative;overflow:hidden;background:linear-gradient(180deg,color-mix(in srgb,var(--kc) 7%,var(--panel)),var(--panel) 70%);border:1px solid var(--line);border-radius:13px;padding:13px 15px;box-shadow:var(--sh)}
-.kpi::before{content:"";position:absolute;inset:0 0 auto;height:3px;background:var(--kc)}
-.kpi small{display:block;font-size:12px;color:var(--ink2)}
-.kpi b{display:block;font:800 25px/1.15 var(--f-display);letter-spacing:-.03em;margin-top:3px}
-.kpi b em{font:600 12.5px var(--f-body);color:var(--ink2);font-style:normal;margin-left:3px}
-.kpi span{font-size:11.5px;color:var(--ink3)}
-/* pipeline */
-.pipe{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
-.st{position:relative;padding:12px 13px;border-radius:12px;background:var(--panel2);border:1px solid var(--line)}
-.st:not(:last-child)::after{content:"→";position:absolute;right:-12px;top:50%;transform:translateY(-50%);color:var(--ink3);font-weight:700;z-index:1}
-.st .n{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;font:800 11px var(--f-display);color:#fff;background:var(--sc)}
-.st b{display:block;font:700 14px var(--f-display);margin-top:7px}
-.st small{display:block;font-size:12px;color:var(--ink2);line-height:1.4}
-.st .v{font:700 16px var(--f-display);margin-top:6px;color:var(--sc)}
-/* site board */
-.sites{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.site{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--panel2)}
-.site h4{font-size:14px}
-.site p{margin:2px 0 8px;font-size:12px;color:var(--ink2)}
-.boxes{display:flex;flex-wrap:wrap;gap:6px}
-.bx{border:0;border-radius:8px;padding:5px 8px;font:600 11.5px var(--f-mono);background:color-mix(in srgb,var(--good) 14%,var(--panel));color:var(--good)}
-.bx.warn{background:color-mix(in srgb,var(--warn) 16%,var(--panel));color:var(--warn)}
-.bx.crit{background:color-mix(in srgb,var(--crit) 15%,var(--panel));color:var(--crit)}
-.bx.off{background:var(--panel);color:var(--ink3);border:1px dashed var(--line)}
-/* tables */
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g21{grid-template-columns:2fr 1fr}.gpitch{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}.g12{grid-template-columns:1fr 2fr}
+.kpi{border-radius:12px;padding:14px 16px;color:#fff;display:flex;flex-direction:column;gap:4px}
+.kpi .l{font-size:12px;opacity:.9;font-weight:600;letter-spacing:.02em}.kpi .n{font:700 30px/1 var(--display);font-variant-numeric:tabular-nums}.kpi .s{font-size:12px;opacity:.88}
+.st{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:11.5px;border-radius:999px;padding:3px 10px;color:#fff;white-space:nowrap}
+.st.clear{background:var(--ok)}.st.monitor{background:var(--watch)}.st.review{background:var(--review)}.st.medical{background:var(--medical)}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);font-weight:600}
+td{padding:10px;border-bottom:1px solid #edf2ef;vertical-align:middle}
 .tw{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:13px}
-th{text-align:left;font-size:11.5px;font-weight:600;color:var(--ink2);background:color-mix(in srgb,var(--accent) 6%,var(--panel2));padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
-td{padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap;font-variant-numeric:tabular-nums}
-tbody tr{cursor:pointer}
-tbody tr:hover td{background:color-mix(in srgb,var(--accent) 5%,transparent)}
-tbody tr[aria-selected="true"] td{background:color-mix(in srgb,var(--accent) 10%,transparent)}
-.r{text-align:right}
-.pill{font:600 11px/1 var(--f-body);padding:4px 9px;border-radius:99px;display:inline-block;white-space:nowrap}
-.ok{background:color-mix(in srgb,var(--good) 15%,transparent);color:var(--good)}
-.am{background:color-mix(in srgb,var(--warn) 17%,transparent);color:var(--warn)}
-.rd{background:color-mix(in srgb,var(--crit) 15%,transparent);color:var(--crit)}
-.bl{background:color-mix(in srgb,var(--blue) 15%,transparent);color:var(--blue)}
-.gr{background:var(--panel2);color:var(--ink3);border:1px solid var(--line)}
-.src{display:inline-flex;align-items:center;gap:6px}
-.src i{width:8px;height:8px;border-radius:2px}
-.score{display:inline-flex;align-items:center;gap:8px}
-.score i{display:block;width:54px;height:6px;border-radius:9px;background:var(--panel2);overflow:hidden}
-.score i em{display:block;height:100%;border-radius:9px}
-/* box detail */
-.det{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
-.reads{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.rd2{padding:10px 11px;border-radius:11px;background:var(--panel2);border-left:3px solid var(--good)}
-.rd2.watch{border-left-color:var(--warn)}.rd2.out{border-left-color:var(--crit);background:color-mix(in srgb,var(--crit) 6%,var(--panel2))}
-.rd2 small{display:block;font-size:11.5px;color:var(--ink2)}
-.rd2 b{font:700 17px var(--f-display)}
-.rd2 b em{font:500 11px var(--f-body);color:var(--ink3);font-style:normal;margin-left:2px}
-.rd2 span{display:block;font-size:11px;color:var(--ink3)}
-.rd2 svg{display:block;width:100%;height:26px;margin-top:4px}
-.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px;margin:0}
-.kv dt{color:var(--ink2)}.kv dd{margin:0;font-weight:600;text-align:right}
-/* events */
-.evs{display:flex;flex-direction:column;gap:10px}
-.ev{display:grid;grid-template-columns:6px minmax(0,1fr) auto;gap:12px;align-items:start;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
-.ev .bar{align-self:stretch;border-radius:4px;background:var(--ec)}
-.ev h4{font-size:14.5px}
-.ev p{margin:2px 0 6px;font-size:12.5px;color:var(--ink2)}
-.ev .tr{display:flex;flex-wrap:wrap;gap:5px}
-.ev .tr span{font-size:11.5px;padding:2px 8px;border-radius:99px;background:var(--panel2);border:1px solid var(--line)}
-.ev .meta{text-align:right;font-size:12px;color:var(--ink3);display:flex;flex-direction:column;gap:6px;align-items:flex-end}
-.rules{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
-.rule{padding:12px;border-radius:12px;border:1px solid var(--line);background:linear-gradient(180deg,color-mix(in srgb,var(--ec) 8%,var(--panel)),var(--panel) 70%)}
-.rule b{display:flex;align-items:center;gap:7px;font:700 14px var(--f-display)}
-.rule b i{width:9px;height:9px;border-radius:3px;background:var(--ec)}
-.rule p{margin:4px 0 0;font-size:12.5px;color:var(--ink2)}
-/* model */
-.f{font-family:var(--f-mono);font-size:13px;padding:12px 14px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);overflow-x:auto;white-space:pre}
-.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.steps>div{padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--panel2)}
-.steps b{font:700 14px var(--f-display)}.steps p{margin:4px 0 8px;font-size:12.5px;color:var(--ink2)}
-/* data link */
-.link{display:grid;grid-template-columns:minmax(0,1fr) 80px minmax(0,1fr);align-items:center;gap:10px}
-.end{padding:14px;border-radius:13px;border:1px solid var(--line);background:var(--panel2)}
-.end b{font:700 15px var(--f-display);display:block}
-.end small{font-size:12px;color:var(--ink2)}
-.wire{height:2px;background:linear-gradient(90deg,var(--accent),var(--saffron));position:relative;border-radius:2px}
-.wire::after{content:"";position:absolute;top:-3px;width:8px;height:8px;border-radius:50%;background:var(--accent);animation:flow 1.6s linear infinite}
-@keyframes flow{from{left:0}to{left:calc(100% - 8px)}}
-.tog{display:flex;flex-direction:column;gap:8px}
-.tog label{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);font-size:13.5px;cursor:pointer}
-.tog label small{display:block;color:var(--ink3);font-size:12px}
-.tog input{accent-color:var(--accent);width:16px;height:16px}
-.log{display:flex;flex-direction:column}
-.log div{display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:12.5px}
-.log div:last-child{border-bottom:0}
-.code{font-family:var(--f-mono);font-size:12px;line-height:1.55;padding:12px 14px;border-radius:10px;background:#0B1F24;color:#CFE6E9;overflow-x:auto;white-space:pre}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:13px;box-shadow:var(--sh);z-index:20}
-.note{font-size:12px;color:var(--ink3);margin:0}
-@media (prefers-reduced-motion:reduce){.wire::after{animation:none}}
-@media (max-width:1100px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.g3,.det{grid-template-columns:1fr}}
-@media (max-width:860px){.app{grid-template-columns:1fr}.side{position:static;height:auto;flex-direction:column;padding:12px max(16px,env(safe-area-inset-left,0px)) 10px}.navs{flex-direction:row;overflow-x:auto}.nav{width:auto;white-space:nowrap}.prods{flex-direction:row;overflow-x:auto}.prod{width:auto;white-space:nowrap}.sidefoot,.sec{display:none}.g2,.sites,.steps{grid-template-columns:1fr}.pipe{grid-template-columns:1fr 1fr}.st::after{display:none}.link{grid-template-columns:1fr}.wire{height:24px;width:2px;margin:0 auto;background:linear-gradient(var(--accent),var(--saffron))}.wire::after{display:none}}
-@media (max-width:520px){.kpis{grid-template-columns:1fr 1fr}.reads{grid-template-columns:1fr 1fr}.top,.content{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}.ph h1{font-size:23px}}
-</style>
-
-</head>
+tr.rowlink{cursor:pointer}tr.rowlink:hover td{background:#f6faf8}tr.rowlink:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.small{font-size:12px;color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+.heat td.h{text-align:center;padding:6px}.heat th{font-size:10px;letter-spacing:.03em;padding:8px 4px;white-space:normal}
+.heat i{display:inline-block;width:26px;height:20px;border-radius:5px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}.legend span{display:inline-flex;gap:6px;align-items:center}.legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+.alert{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid #edf2ef}.alert:last-child{border-bottom:0}
+.alert .dot{width:9px;height:9px;border-radius:50%;margin-top:5px;flex:none}
+.ph{background:linear-gradient(120deg,var(--pitch),var(--pitch2));color:#fff;border-radius:14px;padding:18px 20px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;position:relative;overflow:hidden}
+.ph:after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border:2px solid rgba(255,255,255,.12);border-radius:50%}
+.ph .av{width:54px;height:54px;border-radius:50%;background:rgba(255,255,255,.14);display:grid;place-items:center;font:700 16px var(--display)}
+.ph h2{font-size:22px;color:#fff}.ph .meta{color:#bfe0d2;font-size:13px}
+.ph select{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:7px 10px;font:inherit}
+.ph select option{color:#000}
+.ph .rk{margin-left:auto;text-align:right;position:relative;z-index:1}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{all:unset;cursor:pointer;padding:10px 14px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--accent-ink);border-bottom-color:var(--accent)}
+.tab:focus-visible{outline:2px solid var(--accent)}
+.gate{border-radius:12px;padding:12px 16px;display:flex;gap:12px;align-items:flex-start}
+.gate.fire{background:#fbe9ec;border:1.5px solid var(--medical);color:#5c1019}
+.gate.clear{background:#eef7f2;border:1px solid #cfe8db;color:#1d4d3a}
+.gate b{font-family:var(--display)}
+.ln-head{display:flex;align-items:center;gap:10px;margin:4px 0 8px}
+.ln-head i{width:10px;height:10px;border-radius:3px}
+.ln-head h3{font-size:14px;letter-spacing:.04em;text-transform:uppercase}
+.gauge{position:relative;width:170px;height:10px;border-radius:5px;display:flex;overflow:hidden;background:#eef2f0}
+.gwrap{position:relative;width:170px;padding:4px 0}
+.gwrap i{position:absolute;top:0;width:5px;height:18px;border-radius:3px;background:var(--ink);transform:translateX(-50%);box-shadow:0 0 0 2px #fff}
+.val{display:inline-flex;flex-direction:column;align-items:center;min-width:70px;border-radius:8px;padding:5px 9px;font-weight:700;border:1px solid}
+.val small{font-size:9.5px;letter-spacing:.05em;font-weight:600}
+.val.ok{background:#eaf7f0;border-color:#bfe5d2;color:#11683f}.val.md{background:#fff6dc;border-color:#f0d78c;color:#7a5800}.val.hi{background:#fde9e5;border-color:#f3b7ad;color:#a5291b}.val.lo{background:#e7f0fd;border-color:#b8cff2;color:#1f4f9b}.val.ac{background:#fbe0e5;border-color:#e59aa7;color:#8f1d2c}
+.dev{font-weight:700;font-variant-numeric:tabular-nums}.dev.up{color:#a5291b}.dev.down{color:#1f4f9b}.dev.flat{color:var(--muted)}
+.sent{border-radius:12px;border:1px solid var(--line);background:#fff;overflow:hidden}
+.sent .hd{display:flex;align-items:center;gap:10px;padding:11px 14px;color:#fff}
+.sent .hd b{font-family:var(--display);font-size:14px;letter-spacing:.03em}
+.sent .hd .s{margin-left:auto;font-size:11px;font-weight:700;background:rgba(255,255,255,.2);padding:2px 9px;border-radius:999px}
+.sent .arms{padding:10px 14px;display:flex;flex-direction:column;gap:7px}
+.arm{display:flex;gap:10px;align-items:center;font-size:13px}
+.arm .b{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;color:#fff;flex:none}
+.arm .b.y{background:var(--review)}.arm .b.n{background:var(--ok)}.arm .b.q{background:var(--na)}
+.arm .v{margin-left:auto;font-weight:600;font-variant-numeric:tabular-nums}
+.pat{border-left:4px solid var(--accent);background:#fff;border-radius:10px;border:1px solid var(--line);padding:12px 14px}
+.pat.on{border-left-color:var(--review)}
+.pat h4{margin:0;font-family:var(--display);font-size:15px}
+.crit{display:flex;flex-direction:column;gap:4px;margin-top:8px;font-size:13px}
+.crit div{display:flex;gap:8px}.crit .y{color:var(--review);font-weight:700}.crit .n{color:var(--ok);font-weight:700}.crit .q{color:var(--na);font-weight:700}
+.links{display:flex;flex-direction:column;gap:12px}
+.lk{display:grid;grid-template-columns:1fr 60px 1fr;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.lk .n{border-radius:10px;padding:9px 11px;border:1.5px solid}
+.lk .n.on{border-color:var(--review);background:#fff4f2}.lk .n.off{border-color:#cfe8db;background:#f3faf6}
+.lk .ar{text-align:center;font-weight:800;color:var(--muted)}.lk.on .ar{color:var(--review)}
+.lk .note{grid-column:1/-1;font-size:12.5px;color:var(--muted)}
+.patc{background:#fff;border:1px solid var(--line);border-top:4px solid var(--pc);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.patc.on{box-shadow:0 6px 20px rgba(224,82,61,.12)}
+.pt-top{display:flex;gap:14px;align-items:center}.pt-top h4{margin:2px 0 2px;font:700 15px var(--display)}
+.pt-ico{display:inline-block;padding:2px 7px;border-radius:5px;background:var(--chalk);color:var(--accent-ink);font:700 10px var(--body);letter-spacing:.08em}
+.pt-badge{display:inline-block;margin-top:6px;font-size:11px;font-weight:700;color:#fff;background:var(--pc);border-radius:999px;padding:2px 9px}
+.pt-crit{display:flex;flex-direction:column;gap:6px}
+.cr{display:flex;gap:9px;align-items:flex-start;font-size:13px;padding:7px 10px;border-radius:8px;background:#f6f9f7}
+.cr .ic{flex:none;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;color:#fff}
+.cr.y{background:#fdf0ed}.cr.y .ic{background:var(--review)}.cr.n .ic{background:var(--ok)}.cr.q .ic{background:var(--na)}.cr em{color:var(--muted)}
+.pt-hist{display:flex;gap:5px;align-items:center;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:10px}
+.pt-hist .hd{font-size:10.5px;font-weight:700;border-radius:6px;padding:3px 7px;background:#e6f3ec;color:#1d6b4a}
+.pt-hist .hd.b{background:#fcefc7;color:#7a5800}.pt-hist .hd.on{background:var(--review);color:#fff}.pt-hist .hd.cur{outline:2px solid var(--ink);outline-offset:1px}
+.lkc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;border-left:4px solid #cfdcd6}.lkc.on{border-left-color:var(--review);background:#fff8f6}.lkc.half{border-left-color:#e9b949}
+.lkr{display:grid;grid-template-columns:1fr 40px 1fr;align-items:center;gap:8px}
+.lkr .nd{border:1.5px solid #cfe8db;background:#f3faf6;border-radius:10px;padding:8px 10px}.lkr .nd.y{border-color:var(--review);background:#fff1ee}
+.lkr .nd b{display:block;font-size:13px}.lkr .nd small{color:var(--muted)}.lkr .ar{text-align:center;font-size:18px;font-weight:800;color:var(--muted)}.lkc.on .ar{color:var(--review)}
+svg text{font-family:var(--body)}
+.ch .ax{font-size:11px;fill:var(--muted)}.ch .gl{stroke:#e8eeeb}.ch .band{fill:#e6f4ec}.ch .bl{stroke:#6d8a80;stroke-dasharray:4 4}.ch .ln{fill:none;stroke:var(--pitch2);stroke-width:2.5}.ch .pr{fill:none;stroke:var(--review);stroke-width:2;stroke-dasharray:5 5}.ch .pt{fill:#fff;stroke:var(--pitch2);stroke-width:2}.ch .pp{fill:#fff;stroke:var(--review);stroke-width:2}.ch .thr{stroke:var(--review);stroke-width:1;stroke-dasharray:2 3}
+.proj{display:flex;flex-direction:column;gap:4px;font-size:13px}
+.selrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pill{all:unset;cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-weight:600;font-size:12.5px}
+.pill[aria-pressed="true"]{background:var(--pitch);color:#fff;border-color:var(--pitch)}
+.pill:focus-visible{outline:2px solid var(--accent)}
+.rep h3{margin-top:4px}.rep ul{margin:6px 0 0;padding-left:18px}.rep li{margin:4px 0}
+.rep .sec{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.step{background:var(--chalk);border:1px solid #c6e6d6;border-radius:10px;padding:10px 12px}
+.step b{display:block;font-family:var(--display);color:var(--pitch)}.step span{font-size:12.5px;color:#36574b}
+.step.g{background:#fbe9ec;border-color:#efb7c0}.step.g b{color:var(--medical)}
+.modal{position:fixed;inset:0;background:rgba(6,30,23,.55);display:grid;place-items:center;z-index:50;padding:16px}
+.modal[hidden]{display:none}
+.mbox{background:#fff;border-radius:14px;max-width:580px;width:100%;padding:22px 24px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.mbox h2{font-size:20px;margin-bottom:8px}.mbox ul{padding-left:18px;margin:8px 0}.mbox li{margin:5px 0}
+.btn{all:unset;cursor:pointer;background:var(--pitch);color:#fff;font-weight:700;border-radius:9px;padding:10px 16px}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.spark{vertical-align:middle}
+@media (max-width:1100px){.gpitch{grid-template-columns:minmax(0,1fr)}.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.g3,.g21,.g12{grid-template-columns:minmax(0,1fr)}.steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){.app{grid-template-columns:minmax(0,1fr)}.side{position:static;height:auto}.g2{grid-template-columns:minmax(0,1fr)}.ph .rk{margin-left:0;text-align:left}.lk{grid-template-columns:minmax(0,1fr)}.lk .ar{transform:rotate(90deg)}}
+@keyframes pulse{0%,100%{opacity:.15;transform:scale(1)}50%{opacity:.4;transform:scale(1.18)}}.pulse{transform-box:fill-box;transform-origin:center;animation:pulse 2.4s ease-in-out infinite}.pl:hover circle,.pl:focus-visible circle{stroke-width:4}.pl:focus{outline:none}
+@media (prefers-reduced-motion:reduce){.pulse{animation:none}animateMotion{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head>
 <body>
 <div class="app">
- <aside class="side">
-  <div class="brand"><span class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 3c3.5 4.5 6 7.6 6 10.5A6 6 0 0 1 6 13.5C6 10.6 8.5 7.5 12 3z"/></svg></span><div><b>Burak <span>Cloud</span></b><small>One pipeline · many products</small></div></div>
-  <div class="sec">Products</div>
-  <div class="prods">
-   <button class="prod" type="button" data-toast="Burak Ovine opens in its own app."><i style="background:#57BC82"></i>Burak Ovine<small>sheep</small></button>
-   <button class="prod" type="button" aria-current="true"><i style="background:#4BC0C9"></i>Wonder Box<small>water</small></button>
-   <button class="prod" type="button" data-toast="Human health runs in a separate, secured project."><i style="background:#A796EC"></i>Human health<small>clinical</small></button>
-  </div>
-  <div class="sec">Wonder Box</div>
-  <nav class="navs" id="nav"></nav>
-  <div class="sidefoot">Pilot · Shopian, Pulwama, Pampore<br>Demo data, simulated</div>
- </aside>
- <div class="main">
-  <header class="top">
-   <div class="crumb" id="crumb">Wonder Box / <b>Overview</b></div>
-   <span class="chip"><span class="dot"></span>18 boxes · synced 2 min ago</span>
-   <span class="chip" id="skchip"><span class="dot"></span>SKUAST-K link live</span>
-   <button class="btn" type="button" id="themeBtn">Theme</button>
-  </header>
-  <main class="content" id="view"></main>
- </div>
+<aside class="side">
+  <div class="brand"><div class="mk">B</div><div><b>Burak</b><span>Football performance · POC</span></div></div>
+  <nav class="nav" aria-label="Main">
+    <div class="lab">Squad</div>
+    <button data-nav="dash">Squad dashboard</button>
+    <button data-nav="players">Players</button>
+    <div class="lab">Analysis</div>
+    <button data-nav="player">Player analysis</button>
+    <button data-nav="season">Season trends</button>
+    <div class="lab">About</div>
+    <button data-nav="method">Method &amp; evidence</button>
+  </nav>
+  <div class="foot">Demo FC · first team<br>Illustrative data only</div>
+</aside>
+<div class="main">
+  <div class="poc" role="note"><b>PROOF OF CONCEPT</b><span>Every player, value and date is fictional. Signals support staff review; they do not diagnose or predict individual injuries.</span><button class="linkbtn" id="aboutBtn">About this demo</button></div>
+  <header class="top"><div><h1 id="ttl"></h1><p id="sub"></p></div><span class="chip-ws">Qatar · Demo FC workspace</span></header>
+  <main class="view" id="view"></main>
 </div>
-<div class="toast" id="toast" hidden></div>
-
+</div>
+<div class="modal" id="about" role="dialog" aria-modal="true" aria-labelledby="abT" hidden><div class="mbox">
+  <h2 id="abT">Burak for football: proof of concept</h2>
+  <p>Burak reads a squad’s routine blood tests across a season and turns them into early signals for performance and medical staff: muscle recovery, overreaching, iron, hydration in the heat, energy availability, bone health and illness.</p>
+  <ul>
+    <li><b>Illustrative only.</b> Players, results and dates are fictional. Ranges and rules are drawn from published sports-science literature and are illustrative until reviewed by the club’s medical team.</li>
+    <li><b>Personal baselines.</b> Each player is compared with his own earlier results, not only with population ranges.</li>
+    <li><b>Staff decide.</b> Burak flags and explains. It does not diagnose, clear players to play, or predict injuries for an individual.</li>
+  </ul>
+  <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn" id="aboutOk">Open the demo</button></div>
+</div></div>
 <script>
-const R=(()=>{let s=20261017;return()=>{s=(s*1664525+1013904223)%4294967296;return s/4294967296;};})();
-const $=s=>document.querySelector(s);
-const fmt=(n,d=0)=>Number(n).toLocaleString('en-GB',{minimumFractionDigits:d,maximumFractionDigits:d});
-const SRC={Borewell:'var(--blue)',Spring:'var(--good)',Canal:'var(--saffron)',Stream:'var(--violet)'};
-const SITES=[
- {k:'SHP',n:'Shopian',c:'Apple, high-density',d:'South Kashmir orchard belt'},
- {k:'PLW',n:'Pulwama',c:'Apple and cherry',d:'Karewa terraces'},
- {k:'PMP',n:'Pampore',c:'Saffron',d:'Karewa saffron fields'}];
-const RANGES={ec:[150,700,'µS/cm','Salts (EC)'],ph:[6.5,8.0,'','pH'],turb:[0,5,'NTU','Cloudiness'],press:[1.5,3.0,'bar','Pressure'],temp:[6,18,'°C','Water temp'],flow:[0,0,'m³','Flow today']};
-// boxes
-const BOXES=[];
-const plan=[['SHP',7],['PLW',6],['PMP',5]];
-const srcs=['Borewell','Spring','Canal','Stream'];
-let idx=0;
-plan.forEach(([k,n])=>{for(let i=1;i<=n;i++){idx++;
- const site=SITES.find(s=>s.k===k),src=k==='PMP'?(i%2?'Borewell':'Canal'):srcs[(i+idx)%4];
- const need=k==='PMP'?+(6+R()*4).toFixed(1):+(14+R()*10).toFixed(1);
- let used=+(need*(0.85+R()*0.6)).toFixed(1),ec=Math.round(260+R()*260),ph=+(6.9+R()*0.8).toFixed(1),turb=+(0.6+R()*2.6).toFixed(1),press=+(2+R()*0.7).toFixed(1),temp=+(9+R()*5).toFixed(1),status='ok',ev=null;
- const id=`WB-${k}-${String(i).padStart(2,'0')}`;
- if(id==='WB-SHP-03'){turb=11.8;ec=812;ev='runoff';status='crit';}
- if(id==='WB-PLW-02'){press=1.1;ec=745;used=+(need*1.55).toFixed(1);ev='overpump';status='warn';}
- if(id==='WB-SHP-06'){ev='contam';status='warn';turb=4.4;ec=690;}
- if(id==='WB-PMP-04'){used=+(need*0.55).toFixed(1);ev='under';status='warn';}
- if(id==='WB-PLW-05'){status='off';}
- BOXES.push({id,k,site,src:id==='WB-SHP-03'?'Spring':src,crop:site.c,need,used,ec,ph,turb,press,temp,status,ev,sync:status==='off'?'6 h ago':`${1+Math.floor(R()*9)} min ago`});}});
-BOXES.forEach(b=>{const z=[(b.ec-425)/137,(b.ph-7.25)/.37,(b.turb-2.5)/1.25,(2.25-b.press)/.37].map(v=>Math.max(0,Math.abs(v)-1));b.score=Math.max(18,Math.round(100-z.reduce((a,v)=>a+v,0)*14));if(b.status==='off')b.score=null;});
-const stOf=(v,[lo,hi])=>v<lo||v>hi?'out':(v<lo+(hi-lo)*.1||v>hi-(hi-lo)*.1)?'watch':'ok';
-const EVT={
- runoff:{n:'Runoff',c:'var(--crit)',rule:'Cloudiness and salts jump together within hours of rain or orchard spraying.',tr:['Turbidity > 10 NTU','EC up > 40% vs source normal','Rain or spray logged in last 24 h']},
- overpump:{n:'Over-pumping',c:'var(--warn)',rule:'Pressure and flow fall while salts rise: the borewell is being drawn too hard.',tr:['Pressure < 1.5 bar','EC rising 3 days running','Use > 140% of crop need']},
- contam:{n:'Contamination watch',c:'var(--violet)',rule:'An unusual pattern at a source the sensors cannot explain. A lab test is requested.',tr:['EC and turbidity drifting from source normal','Spring season, spray window','No rain to explain it']},
- under:{n:'Under-watering',c:'var(--blue)',rule:'The crop got far less than it needed for several days.',tr:['Use < 60% of crop need','3 days running','Hot, dry forecast']},
- leak:{n:'Leak or pressure loss',c:'var(--saffron)',rule:'Flow continues with no valve open, or pressure drops suddenly.',tr:['Night flow > 0 with valves shut','Pressure drop > 30% in an hour']}};
-const EVENTS=[
- {id:'E-1042',k:'runoff',box:'WB-SHP-03',when:'Today 06:40',st:['rd','Open · lab requested'],note:'Turbidity 11.8 NTU and EC 812 µS/cm after overnight rain and a fungicide spray on 16 Oct.'},
- {id:'E-1041',k:'overpump',box:'WB-PLW-02',when:'Yesterday 18:15',st:['am','Open'],note:'Pressure 1.1 bar; use 155% of crop need; EC rising for 3 days.'},
- {id:'E-1039',k:'contam',box:'WB-SHP-06',when:'16 Oct 11:20',st:['bl','Sample at SKUAST-K lab'],note:'Slow drift in EC and cloudiness with no rain. Pesticide panel requested.'},
- {id:'E-1036',k:'under',box:'WB-PMP-04',when:'15 Oct 09:00',st:['am','Advisory sent'],note:'Saffron field got 55% of its need for 3 days during corm sprouting.'},
- {id:'E-1030',k:'leak',box:'WB-PLW-04',when:'12 Oct 02:10',st:['ok','Closed · fixed'],note:'Night flow with valves shut. Cracked joint on the manifold outlet, replaced.'}];
-const LAB=[
- {s:'S-2207',box:'WB-SHP-03',ev:'E-1042',sent:'Today',test:'Pesticide panel + nitrate',st:['am','Collected'],res:'—'},
- {s:'S-2204',box:'WB-SHP-06',ev:'E-1039',sent:'16 Oct',test:'Pesticide panel',st:['bl','At SKUAST-K lab'],res:'Due 21 Oct'},
- {s:'S-2196',box:'WB-SHP-01',ev:'Routine',sent:'01 Oct',test:'Monthly routine panel',st:['ok','Result in'],res:'Chlorpyrifos detected, below limit'},
- {s:'S-2195',box:'WB-PLW-03',ev:'Routine',sent:'01 Oct',test:'Monthly routine panel',st:['ok','Result in'],res:'None detected'},
- {s:'S-2193',box:'WB-PMP-02',ev:'Routine',sent:'01 Oct',test:'Monthly routine panel',st:['ok','Result in'],res:'Nitrate 38 mg/L, watch'}];
-const series=(base,amp,n=24,spike)=>Array.from({length:n},(_,i)=>+(base+Math.sin(i/3.2)*amp*.5+(R()-.5)*amp*.6+(spike&&i>n-5?spike*(i-(n-5))/4:0)).toFixed(2));
-const spark=(vals,col,lo,hi)=>{const mn=Math.min(lo??Infinity,...vals),mx=Math.max(hi??-Infinity,...vals),r=(mx-mn)||1,X=i=>i*(100/(vals.length-1)),Y=v=>24-(v-mn)/r*22;const d=vals.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)).join('');return `<svg viewBox="0 0 100 26" preserveAspectRatio="none" aria-hidden="true"><path d="${d}L100 26L0 26Z" fill="${col}" fill-opacity=".14"/><path d="${d}" fill="none" stroke="${col}" stroke-width="1.6" vector-effect="non-scaling-stroke"/><circle cx="100" cy="${Y(vals.at(-1)).toFixed(1)}" r="2.2" fill="${col}"/></svg>`;};
-const scoreCell=b=>b.score===null?'<span class="pill gr">No data</span>':`<span class="score"><i><em style="width:${b.score}%;background:${b.score>=75?'var(--good)':b.score>=50?'var(--warn)':'var(--crit)'}"></em></i><b class="num">${b.score}</b></span>`;
-const statPill=b=>({ok:'<span class="pill ok">Normal</span>',warn:'<span class="pill am">Watch</span>',crit:'<span class="pill rd">Act now</span>',off:'<span class="pill gr">Offline</span>'})[b.status];
-const srcCell=s=>`<span class="src"><i style="background:${SRC[s]}"></i>${s}</span>`;
-const pctUse=b=>Math.round(b.used/b.need*100);
+const DATA=[{"id": "DFC-04", "pos": "Centre-back", "age": 27, "note": "All markers stable across the season", "rep": [{"d": "2026-07-06", "phase": "Pre-season heat camp", "v": {"CK": 320, "LDH": 176, "HSCRP": 0.6, "IL6": 1.6, "WBC": 6.1, "NEUT": 3.4, "LYMPH": 1.9, "TEST": 19.1, "CORT": 393, "HB": 14.9, "FER": 88, "TSAT": 29, "UREA": 5.2, "CREA": 92, "NA": 139, "USG": 1.012, "GLU": 4.6, "FT3": 5.1, "VITD": 69, "CA": 2.36, "MG": 0.88}, "ctx": {"minutes7": 0, "heat": 5, "mass": 69.0, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-08-10", "phase": "Early season", "v": {"CK": 305, "LDH": 180, "HSCRP": 0.6, "IL6": 1.8, "WBC": 6.3, "NEUT": 3.2, "LYMPH": 2.1, "TEST": 18.4, "CORT": 386, "HB": 15.2, "FER": 86, "TSAT": 30, "UREA": 5.2, "CREA": 95, "NA": 140, "USG": 1.012, "GLU": 4.8, "FT3": 5.0, "VITD": 70, "CA": 2.38, "MG": 0.86}, "ctx": {"minutes7": 160, "heat": 3, "mass": 68.8, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-09-14", "phase": "In-season", "v": {"CK": 319, "LDH": 185, "HSCRP": 0.6, "IL6": 1.7, "WBC": 6.0, "NEUT": 3.4, "LYMPH": 2.0, "TEST": 19.7, "CORT": 399, "HB": 14.8, "FER": 87, "TSAT": 30, "UREA": 5.2, "CREA": 94, "NA": 138, "USG": 1.01, "GLU": 4.6, "FT3": 5.2, "VITD": 67, "CA": 2.35, "MG": 0.85}, "ctx": {"minutes7": 250, "heat": 2, "mass": 69.1, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-10-12", "phase": "Congested fixtures", "v": {"CK": 301, "LDH": 178, "HSCRP": 0.6, "IL6": 1.8, "WBC": 6.4, "NEUT": 3.4, "LYMPH": 2.0, "TEST": 18.9, "CORT": 385, "HB": 15.3, "FER": 91, "TSAT": 29, "UREA": 5.3, "CREA": 92, "NA": 138, "USG": 1.012, "GLU": 4.7, "FT3": 5.0, "VITD": 66, "CA": 2.36, "MG": 0.85}, "ctx": {"minutes7": 330, "heat": 1, "mass": 68.9, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-11-09", "phase": "In-season", "v": {"CK": 322, "LDH": 182, "HSCRP": 0.6, "IL6": 1.7, "WBC": 6.3, "NEUT": 3.2, "LYMPH": 2.1, "TEST": 19.4, "CORT": 401, "HB": 15.2, "FER": 87, "TSAT": 30, "UREA": 5.2, "CREA": 95, "NA": 138, "USG": 1.01, "GLU": 4.6, "FT3": 5.0, "VITD": 68, "CA": 2.34, "MG": 0.83}, "ctx": {"minutes7": 240, "heat": 0, "mass": 68.5, "timing": "Morning, rested (36 h+ after match)"}}]}, {"id": "DFC-08", "pos": "Central midfielder", "age": 24, "note": "Overreaching signals building through congested fixtures", "rep": [{"d": "2026-07-06", "phase": "Pre-season heat camp", "v": {"CK": 301, "LDH": 181, "HSCRP": 0.6, "IL6": 1.8, "WBC": 6.3, "NEUT": 3.3, "LYMPH": 2.1, "TEST": 18.8, "CORT": 403, "HB": 14.7, "FER": 97, "TSAT": 34, "UREA": 5.4, "CREA": 94, "NA": 139, "USG": 1.01, "GLU": 4.8, "FT3": 5.0, "VITD": 74, "CA": 2.38, "MG": 0.84}, "ctx": {"minutes7": 0, "heat": 5, "mass": 85.3, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-08-10", "phase": "Early season", "v": {"CK": 381, "LDH": 196, "HSCRP": 0.6, "IL6": 1.8, "WBC": 6.1, "NEUT": 3.1, "LYMPH": 2.0, "TEST": 18.8, "CORT": 426, "HB": 14.8, "FER": 103, "TSAT": 34, "UREA": 5.6, "CREA": 91, "NA": 138, "USG": 1.01, "GLU": 4.6, "FT3": 4.7, "VITD": 73, "CA": 2.39, "MG": 0.84}, "ctx": {"minutes7": 160, "heat": 3, "mass": 85.1, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-09-14", "phase": "In-season", "v": {"CK": 486, "LDH": 219, "HSCRP": 0.9, "IL6": 2.5, "WBC": 6.5, "NEUT": 3.3, "LYMPH": 2.0, "TEST": 17.2, "CORT": 448, "HB": 15.0, "FER": 99, "TSAT": 34, "UREA": 5.6, "CREA": 91, "NA": 139, "USG": 1.013, "GLU": 4.8, "FT3": 4.7, "VITD": 70, "CA": 2.34, "MG": 0.84}, "ctx": {"minutes7": 250, "heat": 2, "mass": 85.3, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-10-12", "phase": "Congested fixtures", "v": {"CK": 991, "LDH": 258, "HSCRP": 2.8, "IL6": 5.0, "WBC": 6.2, "NEUT": 3.2, "LYMPH": 1.9, "TEST": 13.9, "CORT": 563, "HB": 14.9, "FER": 100, "TSAT": 34, "UREA": 5.4, "CREA": 95, "NA": 140, "USG": 1.01, "GLU": 4.6, "FT3": 4.7, "VITD": 71, "CA": 2.37, "MG": 0.81}, "ctx": {"minutes7": 420, "heat": 1, "mass": 85.0, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-11-09", "phase": "In-season", "v": {"CK": 1135, "LDH": 279, "HSCRP": 3.9, "IL6": 6.4, "WBC": 6.3, "NEUT": 3.3, "LYMPH": 2.0, "TEST": 13.0, "CORT": 596, "HB": 14.8, "FER": 100, "TSAT": 32, "UREA": 5.4, "CREA": 90, "NA": 138, "USG": 1.012, "GLU": 4.6, "FT3": 4.8, "VITD": 73, "CA": 2.36, "MG": 0.81}, "ctx": {"minutes7": 240, "heat": 0, "mass": 85.1, "timing": "Morning, rested (36 h+ after match)"}}]}, {"id": "DFC-11", "pos": "Winger", "age": 21, "note": "Falling iron stores without anaemia", "rep": [{"d": "2026-07-06", "phase": "Pre-season heat camp", "v": {"CK": 334, "LDH": 195, "HSCRP": 0.6, "IL6": 1.9, "WBC": 6.2, "NEUT": 3.2, "LYMPH": 2.1, "TEST": 18.9, "CORT": 410, "HB": 15.1, "FER": 98, "TSAT": 31, "UREA": 5.6, "CREA": 95, "NA": 139, "USG": 1.017, "GLU": 4.7, "FT3": 4.8, "VITD": 70, "CA": 2.44, "MG": 0.84}, "ctx": {"minutes7": 0, "heat": 5, "mass": 84.2, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-08-10", "phase": "Early season", "v": {"CK": 320, "LDH": 199, "HSCRP": 0.6, "IL6": 1.8, "WBC": 5.8, "NEUT": 3.3, "LYMPH": 2.2, "TEST": 18.8, "CORT": 414, "HB": 15.2, "FER": 74, "TSAT": 26, "UREA": 5.5, "CREA": 92, "NA": 139, "USG": 1.015, "GLU": 4.7, "FT3": 4.9, "VITD": 66, "CA": 2.45, "MG": 0.86}, "ctx": {"minutes7": 160, "heat": 3, "mass": 84.2, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-09-14", "phase": "In-season", "v": {"CK": 313, "LDH": 195, "HSCRP": 0.6, "IL6": 1.8, "WBC": 5.9, "NEUT": 3.2, "LYMPH": 2.2, "TEST": 19.6, "CORT": 435, "HB": 15.0, "FER": 54, "TSAT": 24, "UREA": 5.5, "CREA": 93, "NA": 139, "USG": 1.014, "GLU": 4.8, "FT3": 4.9, "VITD": 66, "CA": 2.44, "MG": 0.86}, "ctx": {"minutes7": 250, "heat": 2, "mass": 84.0, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-10-12", "phase": "Congested fixtures", "v": {"CK": 312, "LDH": 205, "HSCRP": 0.6, "IL6": 1.9, "WBC": 6.0, "NEUT": 3.3, "LYMPH": 2.2, "TEST": 19.6, "CORT": 416, "HB": 14.6, "FER": 40, "TSAT": 19, "UREA": 5.3, "CREA": 90, "NA": 139, "USG": 1.015, "GLU": 4.6, "FT3": 4.8, "VITD": 69, "CA": 2.39, "MG": 0.85}, "ctx": {"minutes7": 330, "heat": 1, "mass": 83.5, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-11-09", "phase": "In-season", "v": {"CK": 319, "LDH": 191, "HSCRP": 0.6, "IL6": 1.7, "WBC": 6.1, "NEUT": 3.3, "LYMPH": 2.1, "TEST": 19.0, "CORT": 439, "HB": 14.4, "FER": 30, "TSAT": 16, "UREA": 5.5, "CREA": 94, "NA": 140, "USG": 1.016, "GLU": 4.8, "FT3": 5.1, "VITD": 67, "CA": 2.43, "MG": 0.86}, "ctx": {"minutes7": 240, "heat": 0, "mass": 83.9, "timing": "Morning, rested (36 h+ after match)"}}]}, {"id": "DFC-09", "pos": "Striker", "age": 29, "note": "Incomplete muscle recovery; low vitamin D", "rep": [{"d": "2026-07-06", "phase": "Pre-season heat camp", "v": {"CK": 494, "LDH": 211, "HSCRP": 0.6, "IL6": 1.7, "WBC": 5.6, "NEUT": 3.5, "LYMPH": 2.0, "TEST": 18.0, "CORT": 383, "HB": 15.4, "FER": 97, "TSAT": 31, "UREA": 5.1, "CREA": 89, "NA": 139, "USG": 1.012, "GLU": 4.5, "FT3": 4.8, "VITD": 41, "CA": 2.41, "MG": 0.87}, "ctx": {"minutes7": 0, "heat": 5, "mass": 77.9, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-08-10", "phase": "Early season", "v": {"CK": 897, "LDH": 248, "HSCRP": 1.5, "IL6": 1.7, "WBC": 6.0, "NEUT": 3.4, "LYMPH": 2.0, "TEST": 18.2, "CORT": 378, "HB": 15.7, "FER": 104, "TSAT": 32, "UREA": 5.4, "CREA": 92, "NA": 139, "USG": 1.014, "GLU": 4.6, "FT3": 5.0, "VITD": 40, "CA": 2.43, "MG": 0.86}, "ctx": {"minutes7": 160, "heat": 3, "mass": 78.1, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-09-14", "phase": "In-season", "v": {"CK": 1151, "LDH": 272, "HSCRP": 3.2, "IL6": 1.6, "WBC": 5.6, "NEUT": 3.5, "LYMPH": 1.9, "TEST": 18.5, "CORT": 394, "HB": 15.5, "FER": 102, "TSAT": 32, "UREA": 5.3, "CREA": 86, "NA": 141, "USG": 1.015, "GLU": 4.6, "FT3": 4.9, "VITD": 36, "CA": 2.38, "MG": 0.87}, "ctx": {"minutes7": 250, "heat": 2, "mass": 77.6, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-10-12", "phase": "Congested fixtures", "v": {"CK": 1187, "LDH": 272, "HSCRP": 3.7, "IL6": 1.7, "WBC": 5.9, "NEUT": 3.6, "LYMPH": 2.0, "TEST": 17.8, "CORT": 391, "HB": 15.5, "FER": 103, "TSAT": 32, "UREA": 5.4, "CREA": 87, "NA": 139, "USG": 1.013, "GLU": 4.7, "FT3": 4.8, "VITD": 34, "CA": 2.37, "MG": 0.84}, "ctx": {"minutes7": 330, "heat": 1, "mass": 77.6, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-11-09", "phase": "In-season", "v": {"CK": 1341, "LDH": 291, "HSCRP": 4.0, "IL6": 1.7, "WBC": 5.8, "NEUT": 3.5, "LYMPH": 2.0, "TEST": 17.5, "CORT": 404, "HB": 15.2, "FER": 105, "TSAT": 33, "UREA": 5.1, "CREA": 90, "NA": 141, "USG": 1.016, "GLU": 4.6, "FT3": 4.8, "VITD": 32, "CA": 2.44, "MG": 0.85}, "ctx": {"minutes7": 240, "heat": 0, "mass": 77.9, "timing": "Morning, rested (36 h+ after match)"}}]}, {"id": "DFC-03", "pos": "Full-back", "age": 23, "note": "Under-hydration during the heat camp, resolved", "rep": [{"d": "2026-07-06", "phase": "Pre-season heat camp", "v": {"CK": 310, "LDH": 185, "HSCRP": 0.6, "IL6": 1.7, "WBC": 6.7, "NEUT": 3.3, "LYMPH": 2.2, "TEST": 19.4, "CORT": 418, "HB": 15.5, "FER": 94, "TSAT": 30, "UREA": 8.8, "CREA": 110, "NA": 144, "USG": 1.026, "GLU": 4.5, "FT3": 5.0, "VITD": 65, "CA": 2.38, "MG": 0.81}, "ctx": {"minutes7": 0, "heat": 5, "mass": 81.3, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-08-10", "phase": "Early season", "v": {"CK": 299, "LDH": 198, "HSCRP": 0.6, "IL6": 1.7, "WBC": 6.6, "NEUT": 3.5, "LYMPH": 2.3, "TEST": 19.7, "CORT": 409, "HB": 15.1, "FER": 97, "TSAT": 30, "UREA": 5.6, "CREA": 98, "NA": 141, "USG": 1.013, "GLU": 4.7, "FT3": 4.7, "VITD": 66, "CA": 2.39, "MG": 0.8}, "ctx": {"minutes7": 160, "heat": 3, "mass": 81.7, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-09-14", "phase": "In-season", "v": {"CK": 314, "LDH": 187, "HSCRP": 0.6, "IL6": 1.7, "WBC": 6.5, "NEUT": 3.4, "LYMPH": 2.1, "TEST": 19.1, "CORT": 393, "HB": 15.7, "FER": 95, "TSAT": 29, "UREA": 5.3, "CREA": 96, "NA": 140, "USG": 1.012, "GLU": 4.5, "FT3": 4.6, "VITD": 65, "CA": 2.37, "MG": 0.8}, "ctx": {"minutes7": 250, "heat": 2, "mass": 81.3, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-10-12", "phase": "Congested fixtures", "v": {"CK": 304, "LDH": 197, "HSCRP": 0.6, "IL6": 1.7, "WBC": 6.5, "NEUT": 3.4, "LYMPH": 2.2, "TEST": 19.3, "CORT": 388, "HB": 15.2, "FER": 99, "TSAT": 29, "UREA": 5.1, "CREA": 93, "NA": 141, "USG": 1.011, "GLU": 4.5, "FT3": 4.7, "VITD": 65, "CA": 2.4, "MG": 0.83}, "ctx": {"minutes7": 330, "heat": 1, "mass": 81.8, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-11-09", "phase": "In-season", "v": {"CK": 311, "LDH": 184, "HSCRP": 0.6, "IL6": 1.7, "WBC": 6.7, "NEUT": 3.4, "LYMPH": 2.2, "TEST": 18.8, "CORT": 399, "HB": 15.7, "FER": 97, "TSAT": 31, "UREA": 5.3, "CREA": 90, "NA": 139, "USG": 1.011, "GLU": 4.6, "FT3": 4.9, "VITD": 68, "CA": 2.42, "MG": 0.82}, "ctx": {"minutes7": 240, "heat": 0, "mass": 81.7, "timing": "Morning, rested (36 h+ after match)"}}]}, {"id": "DFC-01", "pos": "Goalkeeper", "age": 31, "note": "Stable; vitamin D insufficient", "rep": [{"d": "2026-07-06", "phase": "Pre-season heat camp", "v": {"CK": 330, "LDH": 194, "HSCRP": 0.6, "IL6": 1.9, "WBC": 5.8, "NEUT": 3.5, "LYMPH": 2.2, "TEST": 18.7, "CORT": 389, "HB": 14.5, "FER": 97, "TSAT": 32, "UREA": 5.2, "CREA": 87, "NA": 140, "USG": 1.017, "GLU": 4.6, "FT3": 4.6, "VITD": 65, "CA": 2.34, "MG": 0.84}, "ctx": {"minutes7": 0, "heat": 5, "mass": 76.1, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-08-10", "phase": "Early season", "v": {"CK": 326, "LDH": 196, "HSCRP": 0.6, "IL6": 1.9, "WBC": 6.1, "NEUT": 3.5, "LYMPH": 2.2, "TEST": 18.0, "CORT": 386, "HB": 15.1, "FER": 95, "TSAT": 33, "UREA": 5.2, "CREA": 87, "NA": 139, "USG": 1.015, "GLU": 4.7, "FT3": 5.0, "VITD": 62, "CA": 2.34, "MG": 0.82}, "ctx": {"minutes7": 180, "heat": 3, "mass": 76.7, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-09-14", "phase": "In-season", "v": {"CK": 309, "LDH": 185, "HSCRP": 0.6, "IL6": 1.9, "WBC": 6.1, "NEUT": 3.7, "LYMPH": 2.1, "TEST": 19.1, "CORT": 409, "HB": 14.8, "FER": 95, "TSAT": 33, "UREA": 5.3, "CREA": 86, "NA": 140, "USG": 1.015, "GLU": 4.7, "FT3": 4.7, "VITD": 60, "CA": 2.31, "MG": 0.82}, "ctx": {"minutes7": 270, "heat": 2, "mass": 76.2, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-10-12", "phase": "Congested fixtures", "v": {"CK": 330, "LDH": 186, "HSCRP": 0.6, "IL6": 1.9, "WBC": 5.8, "NEUT": 3.7, "LYMPH": 2.2, "TEST": 18.3, "CORT": 381, "HB": 14.9, "FER": 96, "TSAT": 33, "UREA": 5.1, "CREA": 88, "NA": 141, "USG": 1.013, "GLU": 4.7, "FT3": 4.9, "VITD": 62, "CA": 2.32, "MG": 0.81}, "ctx": {"minutes7": 270, "heat": 1, "mass": 76.0, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-11-09", "phase": "In-season", "v": {"CK": 329, "LDH": 188, "HSCRP": 0.6, "IL6": 2.0, "WBC": 5.8, "NEUT": 3.5, "LYMPH": 2.2, "TEST": 18.6, "CORT": 387, "HB": 15.1, "FER": 96, "TSAT": 31, "UREA": 5.0, "CREA": 91, "NA": 141, "USG": 1.016, "GLU": 4.8, "FT3": 4.6, "VITD": 58, "CA": 2.35, "MG": 0.85}, "ctx": {"minutes7": 270, "heat": 0, "mass": 76.7, "timing": "Morning, rested (36 h+ after match)"}}]}, {"id": "DFC-06", "pos": "Central midfielder", "age": 26, "note": "Low energy availability signals; bone health review", "rep": [{"d": "2026-07-06", "phase": "Pre-season heat camp", "v": {"CK": 310, "LDH": 189, "HSCRP": 0.6, "IL6": 1.9, "WBC": 6.5, "NEUT": 3.1, "LYMPH": 2.1, "TEST": 19.7, "CORT": 449, "HB": 15.3, "FER": 95, "TSAT": 30, "UREA": 5.4, "CREA": 92, "NA": 141, "USG": 1.012, "GLU": 4.6, "FT3": 4.8, "VITD": 48, "CA": 2.34, "MG": 0.82}, "ctx": {"minutes7": 0, "heat": 5, "mass": 77.8, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-08-10", "phase": "Early season", "v": {"CK": 320, "LDH": 178, "HSCRP": 0.6, "IL6": 1.8, "WBC": 6.4, "NEUT": 3.3, "LYMPH": 2.2, "TEST": 18.5, "CORT": 438, "HB": 15.7, "FER": 97, "TSAT": 29, "UREA": 5.4, "CREA": 92, "NA": 142, "USG": 1.009, "GLU": 4.4, "FT3": 4.6, "VITD": 47, "CA": 2.38, "MG": 0.8}, "ctx": {"minutes7": 160, "heat": 3, "mass": 76.8, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-09-14", "phase": "In-season", "v": {"CK": 304, "LDH": 177, "HSCRP": 0.6, "IL6": 1.8, "WBC": 6.8, "NEUT": 3.2, "LYMPH": 2.3, "TEST": 16.1, "CORT": 434, "HB": 15.5, "FER": 100, "TSAT": 29, "UREA": 5.3, "CREA": 92, "NA": 140, "USG": 1.01, "GLU": 3.9, "FT3": 3.6, "VITD": 42, "CA": 2.29, "MG": 0.83}, "ctx": {"minutes7": 250, "heat": 2, "mass": 75.8, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-10-12", "phase": "Congested fixtures", "v": {"CK": 302, "LDH": 179, "HSCRP": 0.6, "IL6": 1.8, "WBC": 6.5, "NEUT": 3.1, "LYMPH": 2.3, "TEST": 14.2, "CORT": 427, "HB": 15.0, "FER": 96, "TSAT": 30, "UREA": 5.4, "CREA": 88, "NA": 140, "USG": 1.012, "GLU": 3.7, "FT3": 2.9, "VITD": 40, "CA": 2.19, "MG": 0.81}, "ctx": {"minutes7": 420, "heat": 1, "mass": 75.1, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-11-09", "phase": "In-season", "v": {"CK": 310, "LDH": 181, "HSCRP": 0.6, "IL6": 1.9, "WBC": 6.5, "NEUT": 3.1, "LYMPH": 2.2, "TEST": 12.7, "CORT": 425, "HB": 15.6, "FER": 96, "TSAT": 31, "UREA": 5.3, "CREA": 94, "NA": 141, "USG": 1.01, "GLU": 3.5, "FT3": 2.8, "VITD": 39, "CA": 2.14, "MG": 0.8}, "ctx": {"minutes7": 240, "heat": 0, "mass": 74.3, "timing": "Morning, rested (36 h+ after match)"}}]}, {"id": "DFC-17", "pos": "Winger", "age": 19, "note": "Illness signals after an infection in October", "rep": [{"d": "2026-07-06", "phase": "Pre-season heat camp", "v": {"CK": 320, "LDH": 186, "HSCRP": 0.6, "IL6": 1.7, "WBC": 6.4, "NEUT": 3.5, "LYMPH": 2.0, "TEST": 18.8, "CORT": 441, "HB": 15.4, "FER": 87, "TSAT": 29, "UREA": 5.7, "CREA": 99, "NA": 139, "USG": 1.01, "GLU": 4.9, "FT3": 4.7, "VITD": 74, "CA": 2.36, "MG": 0.87}, "ctx": {"minutes7": 0, "heat": 5, "mass": 70.9, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-08-10", "phase": "Early season", "v": {"CK": 316, "LDH": 187, "HSCRP": 0.6, "IL6": 1.7, "WBC": 6.2, "NEUT": 3.6, "LYMPH": 2.0, "TEST": 18.9, "CORT": 423, "HB": 15.6, "FER": 90, "TSAT": 29, "UREA": 5.7, "CREA": 98, "NA": 140, "USG": 1.009, "GLU": 4.8, "FT3": 4.7, "VITD": 70, "CA": 2.39, "MG": 0.84}, "ctx": {"minutes7": 160, "heat": 3, "mass": 70.9, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-09-14", "phase": "In-season", "v": {"CK": 313, "LDH": 183, "HSCRP": 0.6, "IL6": 1.6, "WBC": 6.3, "NEUT": 3.7, "LYMPH": 2.0, "TEST": 18.3, "CORT": 440, "HB": 15.4, "FER": 93, "TSAT": 29, "UREA": 5.8, "CREA": 100, "NA": 140, "USG": 1.011, "GLU": 4.7, "FT3": 5.1, "VITD": 72, "CA": 2.42, "MG": 0.88}, "ctx": {"minutes7": 250, "heat": 2, "mass": 70.6, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-10-12", "phase": "Congested fixtures", "v": {"CK": 320, "LDH": 197, "HSCRP": 4.1, "IL6": 6.0, "WBC": 3.8, "NEUT": 1.9, "LYMPH": 0.9, "TEST": 18.7, "CORT": 451, "HB": 15.2, "FER": 90, "TSAT": 31, "UREA": 5.5, "CREA": 94, "NA": 140, "USG": 1.009, "GLU": 4.7, "FT3": 4.8, "VITD": 70, "CA": 2.42, "MG": 0.87}, "ctx": {"minutes7": 0, "heat": 1, "mass": 71.2, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-11-09", "phase": "In-season", "v": {"CK": 305, "LDH": 194, "HSCRP": 0.9, "IL6": 2.2, "WBC": 6.0, "NEUT": 3.2, "LYMPH": 1.8, "TEST": 19.1, "CORT": 443, "HB": 15.8, "FER": 87, "TSAT": 31, "UREA": 5.7, "CREA": 95, "NA": 141, "USG": 1.009, "GLU": 4.9, "FT3": 4.9, "VITD": 71, "CA": 2.41, "MG": 0.86}, "ctx": {"minutes7": 240, "heat": 0, "mass": 70.6, "timing": "Morning, rested (36 h+ after match)"}}]}, {"id": "DFC-05", "pos": "Centre-back", "age": 30, "note": "Very high CK after a heat session in August (safety alert)", "rep": [{"d": "2026-07-06", "phase": "Pre-season heat camp", "v": {"CK": 386, "LDH": 174, "HSCRP": 0.6, "IL6": 1.7, "WBC": 6.3, "NEUT": 3.6, "LYMPH": 2.1, "TEST": 19.5, "CORT": 395, "HB": 15.0, "FER": 86, "TSAT": 29, "UREA": 5.3, "CREA": 93, "NA": 141, "USG": 1.018, "GLU": 4.6, "FT3": 4.7, "VITD": 67, "CA": 2.36, "MG": 0.81}, "ctx": {"minutes7": 0, "heat": 5, "mass": 74.3, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-08-10", "phase": "Early season", "v": {"CK": 15114, "LDH": 561, "HSCRP": 0.6, "IL6": 1.7, "WBC": 6.2, "NEUT": 3.8, "LYMPH": 2.0, "TEST": 19.5, "CORT": 404, "HB": 14.5, "FER": 85, "TSAT": 31, "UREA": 5.3, "CREA": 150, "NA": 141, "USG": 1.028, "GLU": 4.5, "FT3": 4.8, "VITD": 70, "CA": 2.36, "MG": 0.83}, "ctx": {"minutes7": 160, "heat": 3, "mass": 74.1, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-09-14", "phase": "In-season", "v": {"CK": 523, "LDH": 191, "HSCRP": 0.6, "IL6": 1.8, "WBC": 6.4, "NEUT": 3.8, "LYMPH": 2.0, "TEST": 20.0, "CORT": 415, "HB": 14.7, "FER": 90, "TSAT": 30, "UREA": 5.4, "CREA": 94, "NA": 139, "USG": 1.015, "GLU": 4.6, "FT3": 4.9, "VITD": 71, "CA": 2.37, "MG": 0.82}, "ctx": {"minutes7": 250, "heat": 2, "mass": 74.2, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-10-12", "phase": "Congested fixtures", "v": {"CK": 433, "LDH": 175, "HSCRP": 0.6, "IL6": 1.7, "WBC": 6.2, "NEUT": 3.7, "LYMPH": 2.2, "TEST": 19.1, "CORT": 419, "HB": 14.3, "FER": 86, "TSAT": 29, "UREA": 5.6, "CREA": 95, "NA": 140, "USG": 1.016, "GLU": 4.7, "FT3": 4.7, "VITD": 69, "CA": 2.38, "MG": 0.82}, "ctx": {"minutes7": 330, "heat": 1, "mass": 74.6, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-11-09", "phase": "In-season", "v": {"CK": 404, "LDH": 183, "HSCRP": 0.6, "IL6": 1.7, "WBC": 6.4, "NEUT": 3.8, "LYMPH": 2.1, "TEST": 19.9, "CORT": 409, "HB": 14.6, "FER": 86, "TSAT": 30, "UREA": 5.3, "CREA": 95, "NA": 139, "USG": 1.015, "GLU": 4.5, "FT3": 5.0, "VITD": 69, "CA": 2.32, "MG": 0.79}, "ctx": {"minutes7": 240, "heat": 0, "mass": 74.0, "timing": "Morning, rested (36 h+ after match)"}}]}, {"id": "DFC-10", "pos": "Striker", "age": 22, "note": "Mild downward ferritin trend", "rep": [{"d": "2026-07-06", "phase": "Pre-season heat camp", "v": {"CK": 333, "LDH": 191, "HSCRP": 0.6, "IL6": 1.8, "WBC": 5.9, "NEUT": 3.3, "LYMPH": 2.1, "TEST": 19.9, "CORT": 424, "HB": 15.2, "FER": 86, "TSAT": 33, "UREA": 5.5, "CREA": 94, "NA": 140, "USG": 1.012, "GLU": 4.7, "FT3": 4.7, "VITD": 69, "CA": 2.39, "MG": 0.85}, "ctx": {"minutes7": 0, "heat": 5, "mass": 83.1, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-08-10", "phase": "Early season", "v": {"CK": 326, "LDH": 197, "HSCRP": 0.6, "IL6": 1.9, "WBC": 6.0, "NEUT": 3.3, "LYMPH": 2.2, "TEST": 19.5, "CORT": 423, "HB": 15.2, "FER": 83, "TSAT": 33, "UREA": 5.4, "CREA": 95, "NA": 139, "USG": 1.013, "GLU": 4.5, "FT3": 4.7, "VITD": 71, "CA": 2.42, "MG": 0.84}, "ctx": {"minutes7": 160, "heat": 3, "mass": 83.3, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-09-14", "phase": "In-season", "v": {"CK": 324, "LDH": 190, "HSCRP": 0.6, "IL6": 1.9, "WBC": 5.6, "NEUT": 3.4, "LYMPH": 2.0, "TEST": 20.5, "CORT": 448, "HB": 15.6, "FER": 75, "TSAT": 32, "UREA": 5.6, "CREA": 94, "NA": 140, "USG": 1.01, "GLU": 4.7, "FT3": 4.5, "VITD": 70, "CA": 2.38, "MG": 0.87}, "ctx": {"minutes7": 250, "heat": 2, "mass": 82.9, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-10-12", "phase": "Congested fixtures", "v": {"CK": 327, "LDH": 200, "HSCRP": 0.6, "IL6": 1.9, "WBC": 5.8, "NEUT": 3.5, "LYMPH": 2.1, "TEST": 20.2, "CORT": 436, "HB": 15.3, "FER": 65, "TSAT": 33, "UREA": 5.7, "CREA": 97, "NA": 138, "USG": 1.012, "GLU": 4.7, "FT3": 4.7, "VITD": 70, "CA": 2.4, "MG": 0.87}, "ctx": {"minutes7": 330, "heat": 1, "mass": 82.7, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-11-09", "phase": "In-season", "v": {"CK": 322, "LDH": 191, "HSCRP": 0.6, "IL6": 2.0, "WBC": 5.6, "NEUT": 3.3, "LYMPH": 2.1, "TEST": 19.7, "CORT": 442, "HB": 15.1, "FER": 61, "TSAT": 31, "UREA": 5.8, "CREA": 97, "NA": 138, "USG": 1.014, "GLU": 4.5, "FT3": 4.7, "VITD": 75, "CA": 2.42, "MG": 0.86}, "ctx": {"minutes7": 240, "heat": 0, "mass": 82.8, "timing": "Morning, rested (36 h+ after match)"}}]}, {"id": "DFC-02", "pos": "Full-back", "age": 25, "note": "Mild under-hydration and low magnesium", "rep": [{"d": "2026-07-06", "phase": "Pre-season heat camp", "v": {"CK": 309, "LDH": 200, "HSCRP": 0.6, "IL6": 1.7, "WBC": 6.3, "NEUT": 3.1, "LYMPH": 2.1, "TEST": 19.8, "CORT": 427, "HB": 15.2, "FER": 94, "TSAT": 31, "UREA": 6.6, "CREA": 95, "NA": 140, "USG": 1.023, "GLU": 4.8, "FT3": 4.9, "VITD": 70, "CA": 2.39, "MG": 0.73}, "ctx": {"minutes7": 0, "heat": 5, "mass": 72.4, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-08-10", "phase": "Early season", "v": {"CK": 296, "LDH": 196, "HSCRP": 0.6, "IL6": 1.7, "WBC": 6.1, "NEUT": 3.2, "LYMPH": 2.0, "TEST": 20.0, "CORT": 421, "HB": 15.3, "FER": 100, "TSAT": 31, "UREA": 6.5, "CREA": 94, "NA": 140, "USG": 1.026, "GLU": 4.8, "FT3": 5.0, "VITD": 71, "CA": 2.4, "MG": 0.7}, "ctx": {"minutes7": 160, "heat": 3, "mass": 72.5, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-09-14", "phase": "In-season", "v": {"CK": 297, "LDH": 197, "HSCRP": 0.6, "IL6": 1.7, "WBC": 5.9, "NEUT": 3.2, "LYMPH": 2.1, "TEST": 19.2, "CORT": 425, "HB": 15.0, "FER": 93, "TSAT": 31, "UREA": 6.8, "CREA": 94, "NA": 140, "USG": 1.024, "GLU": 4.7, "FT3": 5.0, "VITD": 71, "CA": 2.4, "MG": 0.68}, "ctx": {"minutes7": 250, "heat": 2, "mass": 72.3, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-10-12", "phase": "Congested fixtures", "v": {"CK": 301, "LDH": 190, "HSCRP": 0.6, "IL6": 1.7, "WBC": 6.3, "NEUT": 3.1, "LYMPH": 2.1, "TEST": 20.0, "CORT": 424, "HB": 15.5, "FER": 96, "TSAT": 31, "UREA": 7.2, "CREA": 95, "NA": 140, "USG": 1.024, "GLU": 4.8, "FT3": 4.8, "VITD": 71, "CA": 2.39, "MG": 0.69}, "ctx": {"minutes7": 330, "heat": 1, "mass": 71.9, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-11-09", "phase": "In-season", "v": {"CK": 301, "LDH": 190, "HSCRP": 0.6, "IL6": 1.7, "WBC": 5.9, "NEUT": 3.2, "LYMPH": 2.1, "TEST": 19.5, "CORT": 426, "HB": 15.1, "FER": 96, "TSAT": 31, "UREA": 7.4, "CREA": 92, "NA": 141, "USG": 1.027, "GLU": 4.7, "FT3": 5.0, "VITD": 71, "CA": 2.42, "MG": 0.64}, "ctx": {"minutes7": 240, "heat": 0, "mass": 72.4, "timing": "Morning, rested (36 h+ after match)"}}]}, {"id": "DFC-14", "pos": "Central midfielder", "age": 28, "note": "Persistent low-grade inflammation", "rep": [{"d": "2026-07-06", "phase": "Pre-season heat camp", "v": {"CK": 319, "LDH": 178, "HSCRP": 1.8, "IL6": 3.1, "WBC": 6.4, "NEUT": 3.4, "LYMPH": 2.0, "TEST": 17.6, "CORT": 393, "HB": 15.0, "FER": 93, "TSAT": 29, "UREA": 5.6, "CREA": 91, "NA": 139, "USG": 1.017, "GLU": 4.7, "FT3": 5.1, "VITD": 67, "CA": 2.43, "MG": 0.85}, "ctx": {"minutes7": 0, "heat": 5, "mass": 83.2, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-08-10", "phase": "Early season", "v": {"CK": 331, "LDH": 180, "HSCRP": 2.7, "IL6": 4.5, "WBC": 6.6, "NEUT": 3.2, "LYMPH": 2.0, "TEST": 18.1, "CORT": 387, "HB": 15.4, "FER": 94, "TSAT": 31, "UREA": 5.5, "CREA": 98, "NA": 139, "USG": 1.017, "GLU": 4.8, "FT3": 4.8, "VITD": 71, "CA": 2.42, "MG": 0.84}, "ctx": {"minutes7": 160, "heat": 3, "mass": 83.4, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-09-14", "phase": "In-season", "v": {"CK": 323, "LDH": 175, "HSCRP": 3.0, "IL6": 5.4, "WBC": 6.3, "NEUT": 3.3, "LYMPH": 2.0, "TEST": 18.0, "CORT": 413, "HB": 15.1, "FER": 95, "TSAT": 30, "UREA": 5.6, "CREA": 92, "NA": 139, "USG": 1.019, "GLU": 4.7, "FT3": 5.1, "VITD": 69, "CA": 2.4, "MG": 0.84}, "ctx": {"minutes7": 250, "heat": 2, "mass": 83.2, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-10-12", "phase": "Congested fixtures", "v": {"CK": 331, "LDH": 179, "HSCRP": 3.5, "IL6": 5.8, "WBC": 6.6, "NEUT": 3.3, "LYMPH": 1.9, "TEST": 17.6, "CORT": 386, "HB": 15.1, "FER": 96, "TSAT": 30, "UREA": 5.7, "CREA": 96, "NA": 140, "USG": 1.017, "GLU": 4.7, "FT3": 5.1, "VITD": 71, "CA": 2.42, "MG": 0.86}, "ctx": {"minutes7": 420, "heat": 1, "mass": 82.9, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-11-09", "phase": "In-season", "v": {"CK": 331, "LDH": 174, "HSCRP": 4.2, "IL6": 5.9, "WBC": 6.2, "NEUT": 3.2, "LYMPH": 2.0, "TEST": 18.5, "CORT": 407, "HB": 15.2, "FER": 95, "TSAT": 31, "UREA": 5.6, "CREA": 92, "NA": 139, "USG": 1.017, "GLU": 4.6, "FT3": 5.0, "VITD": 71, "CA": 2.44, "MG": 0.83}, "ctx": {"minutes7": 240, "heat": 0, "mass": 83.2, "timing": "Morning, rested (36 h+ after match)"}}]}, {"id": "DFC-18", "pos": "Winger", "age": 24, "note": "Vitamin D deficient with low calcium", "rep": [{"d": "2026-07-06", "phase": "Pre-season heat camp", "v": {"CK": 286, "LDH": 183, "HSCRP": 0.6, "IL6": 1.7, "WBC": 6.7, "NEUT": 3.3, "LYMPH": 1.9, "TEST": 18.2, "CORT": 411, "HB": 15.6, "FER": 104, "TSAT": 32, "UREA": 5.5, "CREA": 86, "NA": 140, "USG": 1.013, "GLU": 4.6, "FT3": 4.9, "VITD": 34, "CA": 2.33, "MG": 0.83}, "ctx": {"minutes7": 0, "heat": 5, "mass": 85.0, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-08-10", "phase": "Early season", "v": {"CK": 285, "LDH": 180, "HSCRP": 0.6, "IL6": 1.7, "WBC": 6.5, "NEUT": 3.5, "LYMPH": 1.8, "TEST": 19.2, "CORT": 426, "HB": 15.1, "FER": 101, "TSAT": 31, "UREA": 5.4, "CREA": 90, "NA": 139, "USG": 1.013, "GLU": 4.6, "FT3": 4.8, "VITD": 32, "CA": 2.24, "MG": 0.81}, "ctx": {"minutes7": 160, "heat": 3, "mass": 85.6, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-09-14", "phase": "In-season", "v": {"CK": 307, "LDH": 182, "HSCRP": 0.6, "IL6": 1.8, "WBC": 6.4, "NEUT": 3.5, "LYMPH": 1.9, "TEST": 19.2, "CORT": 420, "HB": 15.5, "FER": 106, "TSAT": 32, "UREA": 5.4, "CREA": 88, "NA": 140, "USG": 1.014, "GLU": 4.6, "FT3": 4.8, "VITD": 30, "CA": 2.18, "MG": 0.84}, "ctx": {"minutes7": 250, "heat": 2, "mass": 85.2, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-10-12", "phase": "Congested fixtures", "v": {"CK": 284, "LDH": 175, "HSCRP": 0.6, "IL6": 1.8, "WBC": 6.8, "NEUT": 3.5, "LYMPH": 1.8, "TEST": 19.2, "CORT": 437, "HB": 15.7, "FER": 103, "TSAT": 30, "UREA": 5.6, "CREA": 91, "NA": 140, "USG": 1.014, "GLU": 4.6, "FT3": 4.5, "VITD": 28, "CA": 2.17, "MG": 0.81}, "ctx": {"minutes7": 330, "heat": 1, "mass": 85.6, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-11-09", "phase": "In-season", "v": {"CK": 306, "LDH": 174, "HSCRP": 0.6, "IL6": 1.8, "WBC": 6.6, "NEUT": 3.3, "LYMPH": 1.9, "TEST": 19.1, "CORT": 436, "HB": 15.4, "FER": 99, "TSAT": 32, "UREA": 5.5, "CREA": 87, "NA": 140, "USG": 1.014, "GLU": 4.7, "FT3": 4.7, "VITD": 28, "CA": 2.13, "MG": 0.8}, "ctx": {"minutes7": 240, "heat": 0, "mass": 85.2, "timing": "Morning, rested (36 h+ after match)"}}]}, {"id": "DFC-16", "pos": "Defensive midfielder", "age": 33, "note": "Slower recovery with age; T:C ratio drifting", "rep": [{"d": "2026-07-06", "phase": "Pre-season heat camp", "v": {"CK": 428, "LDH": 192, "HSCRP": 0.6, "IL6": 1.8, "WBC": 6.3, "NEUT": 3.5, "LYMPH": 2.1, "TEST": 15.6, "CORT": 444, "HB": 14.7, "FER": 87, "TSAT": 30, "UREA": 5.4, "CREA": 86, "NA": 140, "USG": 1.015, "GLU": 4.7, "FT3": 4.9, "VITD": 65, "CA": 2.39, "MG": 0.87}, "ctx": {"minutes7": 0, "heat": 5, "mass": 76.7, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-08-10", "phase": "Early season", "v": {"CK": 531, "LDH": 203, "HSCRP": 0.6, "IL6": 1.8, "WBC": 6.2, "NEUT": 3.5, "LYMPH": 2.0, "TEST": 13.4, "CORT": 496, "HB": 14.7, "FER": 92, "TSAT": 32, "UREA": 5.5, "CREA": 86, "NA": 140, "USG": 1.012, "GLU": 4.8, "FT3": 4.9, "VITD": 65, "CA": 2.39, "MG": 0.87}, "ctx": {"minutes7": 160, "heat": 3, "mass": 77.0, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-09-14", "phase": "In-season", "v": {"CK": 646, "LDH": 204, "HSCRP": 0.6, "IL6": 1.7, "WBC": 6.2, "NEUT": 3.5, "LYMPH": 2.0, "TEST": 11.8, "CORT": 570, "HB": 15.2, "FER": 86, "TSAT": 31, "UREA": 5.5, "CREA": 86, "NA": 140, "USG": 1.012, "GLU": 4.6, "FT3": 4.6, "VITD": 64, "CA": 2.38, "MG": 0.87}, "ctx": {"minutes7": 250, "heat": 2, "mass": 76.6, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-10-12", "phase": "Congested fixtures", "v": {"CK": 703, "LDH": 203, "HSCRP": 0.6, "IL6": 1.9, "WBC": 6.3, "NEUT": 3.5, "LYMPH": 1.9, "TEST": 10.5, "CORT": 614, "HB": 15.3, "FER": 91, "TSAT": 31, "UREA": 5.6, "CREA": 88, "NA": 141, "USG": 1.013, "GLU": 4.7, "FT3": 4.6, "VITD": 62, "CA": 2.39, "MG": 0.87}, "ctx": {"minutes7": 420, "heat": 1, "mass": 76.8, "timing": "Morning, rested (36 h+ after match)"}}, {"d": "2026-11-09", "phase": "In-season", "v": {"CK": 1004, "LDH": 202, "HSCRP": 0.6, "IL6": 1.8, "WBC": 5.9, "NEUT": 3.3, "LYMPH": 2.1, "TEST": 9.2, "CORT": 683, "HB": 15.0, "FER": 88, "TSAT": 32, "UREA": 5.4, "CREA": 92, "NA": 139, "USG": 1.015, "GLU": 4.7, "FT3": 4.6, "VITD": 63, "CA": 2.4, "MG": 0.85}, "ctx": {"minutes7": 240, "heat": 0, "mass": 76.6, "timing": "Morning, rested (36 h+ after match)"}}]}];
+/* ======================= MARKERS BY BIOLOGICAL LINE ======================= */
+const I=Infinity;
+const LINES=[['MUSCLE','Muscle damage & recovery','--l-muscle'],['INFLAM','Inflammation','--l-inflam'],['IMMUNE','Immune','--l-immune'],['ENDO','Endocrine & training stress','--l-endo'],['OXY','Iron & oxygen delivery','--l-oxy'],['HYDR','Hydration & kidney (heat)','--l-hydr'],['ENERGY','Energy availability','--l-energy'],['BONE','Bone & micronutrients','--l-bone']];
+const M={
+ CK:{n:'CK',full:'Creatine kinase',u:'U/L',l:'MUSCLE',t:[[500,'IN RANGE','ok'],[1000,'RAISED','md'],[10000,'HIGH','hi'],[I,'VERY HIGH','ac']]},
+ LDH:{n:'LDH',full:'Lactate dehydrogenase',u:'U/L',l:'MUSCLE',t:[[250,'IN RANGE','ok'],[350,'RAISED','md'],[I,'HIGH','hi']]},
+ HSCRP:{n:'hs-CRP',full:'High-sensitivity CRP',u:'mg/L',l:'INFLAM',t:[[1,'LOW','ok'],[3,'AVERAGE','ok'],[10,'RAISED','hi'],[I,'ACUTE · REPEAT','ac']]},
+ IL6:{n:'IL-6',full:'Interleukin-6',u:'pg/mL',l:'INFLAM',t:[[5,'IN RANGE','ok'],[I,'RAISED','hi']]},
+ WBC:{n:'WBC',full:'White blood cells',u:'×10⁹/L',l:'IMMUNE',t:[[4,'LOW','lo'],[11,'IN RANGE','ok'],[I,'HIGH','hi']]},
+ NEUT:{n:'NEUT',full:'Neutrophils',u:'×10⁹/L',l:'IMMUNE',t:[[1.8,'LOW','lo'],[7.5,'IN RANGE','ok'],[I,'HIGH','hi']]},
+ LYMPH:{n:'LYMPH',full:'Lymphocytes',u:'×10⁹/L',l:'IMMUNE',t:[[1.0,'LOW','lo'],[4.0,'IN RANGE','ok'],[I,'HIGH','hi']]},
+ NLR:{n:'NLR',full:'Neutrophil–lymphocyte ratio',u:'ratio',l:'IMMUNE',calc:1,t:[[3,'IN RANGE','ok'],[I,'RAISED','hi']]},
+ TEST:{n:'TEST',full:'Testosterone (total)',u:'nmol/L',l:'ENDO',t:[[8.6,'LOW','lo'],[29,'IN RANGE','ok'],[I,'HIGH','hi']]},
+ CORT:{n:'CORT',full:'Cortisol (morning)',u:'nmol/L',l:'ENDO',t:[[140,'LOW','lo'],[690,'IN RANGE','ok'],[I,'HIGH','hi']]},
+ TC:{n:'T:C',full:'Testosterone : cortisol ratio',u:'×1000',l:'ENDO',calc:1,dev:1},
+ HB:{n:'HB',full:'Haemoglobin',u:'g/dL',l:'OXY',t:[[13,'LOW','lo'],[17.5,'IN RANGE','ok'],[I,'HIGH','hi']]},
+ FER:{n:'FER',full:'Ferritin',u:'µg/L',l:'OXY',t:[[35,'LOW STORES','lo'],[300,'IN RANGE','ok'],[I,'HIGH','hi']]},
+ TSAT:{n:'TSAT',full:'Transferrin saturation',u:'%',l:'OXY',t:[[20,'LOW','lo'],[50,'IN RANGE','ok'],[I,'HIGH','hi']]},
+ USG:{n:'USG',full:'Urine specific gravity',u:'',l:'HYDR',t:[[1.0201,'HYDRATED','ok'],[I,'UNDER-HYDRATED','hi']]},
+ UREA:{n:'UREA',full:'Urea',u:'mmol/L',l:'HYDR',t:[[2.5,'LOW','lo'],[7.8,'IN RANGE','ok'],[I,'HIGH','hi']]},
+ CREA:{n:'CREA',full:'Creatinine',u:'µmol/L',l:'HYDR',t:[[60,'LOW','lo'],[115,'IN RANGE','ok'],[I,'HIGH','hi']]},
+ NA:{n:'NA',full:'Sodium',u:'mmol/L',l:'HYDR',t:[[135,'LOW','lo'],[146,'IN RANGE','ok'],[I,'HIGH','hi']]},
+ GLU:{n:'GLU',full:'Fasting glucose',u:'mmol/L',l:'ENERGY',t:[[3.9,'LOW','lo'],[5.6,'IN RANGE','ok'],[I,'HIGH','md']]},
+ FT3:{n:'fT3',full:'Free T3',u:'pmol/L',l:'ENERGY',t:[[3.1,'LOW','lo'],[6.8,'IN RANGE','ok'],[I,'HIGH','hi']]},
+ VITD:{n:'VIT D',full:'Vitamin D, 25-OH',u:'nmol/L',l:'BONE',t:[[50,'DEFICIENT','lo'],[75,'INSUFFICIENT','md'],[I,'SUFFICIENT','ok']]},
+ CA:{n:'CA',full:'Calcium (total)',u:'mmol/L',l:'BONE',t:[[2.15,'LOW','lo'],[2.6,'IN RANGE','ok'],[I,'HIGH','hi']]},
+ MG:{n:'MG',full:'Magnesium',u:'mmol/L',l:'BONE',t:[[0.7,'LOW','lo'],[1.0,'IN RANGE','ok'],[I,'HIGH','hi']]},
+};
+/* ======================= ENGINE ======================= */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const raw=(p,i,k)=>{const v=p.rep[i].v;if(k==='NLR')return v.NEUT!=null&&v.LYMPH?v.NEUT/v.LYMPH:null;if(k==='TC')return v.TEST!=null&&v.CORT?v.TEST/v.CORT*1000:null;return v[k]??null;};
+const base=(p,i,k)=>{if(i===0)return null;const xs=[];for(let j=0;j<i;j++){const x=raw(p,j,k);if(x!=null)xs.push(x);}return xs.length?xs.reduce((a,b)=>a+b,0)/xs.length:null;};
+const dev=(p,i,k)=>{const b=base(p,i,k),v=raw(p,i,k);return b==null||v==null?null:(v-b)/b*100;};
+function tier(p,i,k){const v=raw(p,i,k);if(v==null)return {s:'na',lab:'NOT TESTED'};
+  if(k==='TC'){const d=dev(p,i,k);if(d==null)return {s:'ok',lab:'BASELINE'};return d<=-30?{s:'hi',lab:'DOWN ≥30%'}:d<=-20?{s:'md',lab:'DOWN 20–30%'}:{s:'ok',lab:'STABLE'};}
+  for(const [u,lab,s] of M[k].t){if(v<u)return {s,lab};}return {s:'ok',lab:''};}
+const flagged=s=>s==='hi'||s==='lo'||s==='md'||s==='ac';
+const fmt=(k,v)=>v==null?'—':k==='USG'?v.toFixed(3):Math.abs(v)>=100?Math.round(v).toLocaleString('en-GB'):Math.abs(v)>=10?v.toFixed(1).replace(/\.0$/,''):v.toFixed(2).replace(/0$/,'');
+const sgn=d=>d==null?'—':(d>0?'+':'')+(Math.abs(d)<100?d.toFixed(1).replace(/\.0$/,''):Math.round(d))+'%';
 
-const PAGES=[
- ['ov','Overview','<path d="M4 13h6V4H4zM14 20h6v-9h-6zM4 20h6v-4H4zM14 4v3h6V4z"/>'],
- ['boxes','Wonder Boxes','<rect x="4" y="6" width="16" height="12" rx="2"/><path d="M8 6V4M16 6V4M4 12h16"/>'],
- ['events','Water events','<path d="M12 3 2 20h20zM12 9v5M12 17h.01"/>'],
- ['lab','Lab queue','<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/>'],
- ['model','The model','<path d="M4 19h16M6 15l4-5 3 3 5-7"/>'],
- ['link','SKUAST-K link','<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>']];
-let page='ov',sel='WB-SHP-03';
-function navHTML(){return PAGES.map(([k,l,ic])=>`<button class="nav" type="button" data-p="${k}" ${page===k?'aria-current="page"':''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ic}</svg>${l}${k==='events'?`<span class="ct hot">${EVENTS.filter(e=>!e.st[1].startsWith('Closed')).length}</span>`:k==='lab'?`<span class="ct">${LAB.filter(l=>!l.st[1].startsWith('Result')).length}</span>`:k==='boxes'?`<span class="ct">${BOXES.length}</span>`:''}</button>`).join('');}
-const head=(eb,t,p,extra='')=>`<div class="ph"><div><div class="eb">${eb}</div><h1>${t}</h1><p>${p}</p></div><div style="display:flex;gap:8px;align-items:center">${extra}<span class="sim">Simulated pilot data</span></div></div>`;
+/* Gate 2: safety alerts first (locked, provisional, for synthetic testing). Gate 1: label only. */
+const GATE2=[
+ {id:'CK',lab:'CK 10,000 U/L or above',why:'possible severe muscle breakdown: medical review today',test:(p,i)=>{const v=raw(p,i,'CK');return v==null?null:v>=10000;}},
+ {id:'NA',lab:'Sodium 130 or below, or 150 or above',why:'possible exercise-associated sodium disturbance',test:(p,i)=>{const v=raw(p,i,'NA');return v==null?null:(v<=130||v>=150);}},
+ {id:'HB',lab:'Haemoglobin below 8 g/dL',why:'severe anaemia range',test:(p,i)=>{const v=raw(p,i,'HB');return v==null?null:v<8;}},
+ {id:'GLU',lab:'Glucose below 3.0 mmol/L',why:'low blood glucose',test:(p,i)=>{const v=raw(p,i,'GLU');return v==null?null:v<3.0;}},
+ {id:'CREA',lab:'Creatinine 1.5× personal baseline or more',why:'kidney stress, check with CK and hydration',test:(p,i)=>{const b=base(p,i,'CREA'),v=raw(p,i,'CREA');return b==null||v==null?null:v>=1.5*b;}},
+];
+function gate2(p,i){const r=GATE2.map(g=>({g,st:(x=>x==null?'NOT_EVALUATED':x?'FIRED':'CLEAR')(g.test(p,i))}));return {rules:r,fired:r.filter(x=>x.st==='FIRED')};}
+function gate1(p,i){const ok=['CK','HSCRP','WBC'].every(k=>{const t=tier(p,i,k);return t.s==='ok';});return ok?'Baseline markers (CK, hs-CRP, WBC) in range':'Baseline markers need a look';}
 
-function pOverview(){const live=BOXES.filter(b=>b.status!=='off'),used=live.reduce((a,b)=>a+b.used,0),need=live.reduce((a,b)=>a+b.need,0),over=live.reduce((a,b)=>a+Math.max(0,b.used-b.need),0),open=EVENTS.filter(e=>!e.st[1].startsWith('Closed')).length;
- return head('Wonder Box · Burak Cloud','Water you can finally see','Every litre pumped through a Wonder Box manifold gets a record: how much, how clean, from which source, and whether the crop needed it.')+
- `<div class="kpis">
-  <div class="kpi" style="--kc:var(--accent)"><small>Boxes live</small><b class="num">${live.length}<em>of ${BOXES.length}</em></b><span>1 offline, last seen 6 h ago</span></div>
-  <div class="kpi" style="--kc:var(--blue)"><small>Water pumped today</small><b class="num">${fmt(used,0)}<em>m³</em></b><span>crop need ${fmt(need,0)} m³</span></div>
-  <div class="kpi" style="--kc:var(--saffron)"><small>Over-watering today</small><b class="num">${fmt(over,0)}<em>m³</em></b><span>${Math.round(over/used*100)}% of all water pumped</span></div>
-  <div class="kpi" style="--kc:var(--crit)"><small>Open water events</small><b class="num">${open}</b><span>1 needs action now</span></div>
-  <div class="kpi" style="--kc:var(--violet)"><small>Lab tests pending</small><b class="num">${LAB.filter(l=>!l.st[1].startsWith('Result')).length}</b><span>at SKUAST-K lab</span></div>
- </div>
- <section class="panel"><h3>How a litre becomes a decision</h3><p class="sub">The same Burak pipeline that reads a sheep's blood, reading a field's water. Counts are for today.</p>
-  <div class="pipe">${[['1','Capture','Wonder Box sensors read every 15 minutes, on solar, offline-safe','1,632 readings','var(--accent)'],['2','Check','Faulty sensors, impossible values and gaps caught at entry','14 rejected','var(--saffron)'],['3','Store','Sealed record tied to box, source, farm and crop','1,618 sealed','var(--blue)'],['4','Analyse','Crop need, water health score and named water events','4 events','var(--crit)'],['5','Publish','Advisories and maps pushed to SKUAST-K’s platform','62 records sent','var(--good)']].map(s=>`<div class="st" style="--sc:${s[4]}"><span class="n">${s[0]}</span><b>${s[1]}</b><small>${s[2]}</small><div class="v num">${s[3]}</div></div>`).join('')}</div></section>
- <div class="grid g3">
-  <section class="panel"><h3>Pilot sites</h3><p class="sub">Each chip is one Wonder Box. Select one to open it.</p>
-   <div class="sites">${SITES.map(s=>`<div class="site"><h4>${s.n}</h4><p>${s.c} · ${s.d}</p><div class="boxes">${BOXES.filter(b=>b.k===s.k).map(b=>`<button class="bx ${b.status==='ok'?'':b.status}" type="button" data-box="${b.id}">${b.id.slice(3)}</button>`).join('')}</div></div>`).join('')}</div></section>
-  <section class="panel"><h3>Latest water events</h3><p class="sub">Named when several readings move together.</p>
-   <div class="evs">${EVENTS.slice(0,3).map(evRow).join('')}</div></section>
- </div>`;}
-function evRow(e){const E=EVT[e.k];return `<div class="ev" style="--ec:${E.c}"><span class="bar"></span><div><h4>${E.n} · <span class="mono" style="font-weight:500">${e.box}</span></h4><p>${e.note}</p><div class="tr">${E.tr.map(t=>`<span>${t}</span>`).join('')}</div></div><div class="meta"><span class="pill ${e.st[0]}">${e.st[1]}</span><span class="mono">${e.id}</span><span>${e.when}</span></div></div>`;}
-function pBoxes(){const b=BOXES.find(x=>x.id===sel);
- const rows=BOXES.map(x=>`<tr data-box="${x.id}" aria-selected="${x.id===sel}"><td class="mono">${x.id}</td><td>${x.site.n}</td><td>${x.crop}</td><td>${srcCell(x.src)}</td><td>${statPill(x)}</td><td class="r">${x.status==='off'?'—':pctUse(x)+'%'}</td><td class="r">${x.status==='off'?'—':x.ec}</td><td class="r">${x.status==='off'?'—':x.ph}</td><td class="r">${x.status==='off'?'—':x.turb}</td><td>${scoreCell(x)}</td><td class="r" style="color:var(--ink3)">${x.sync}</td></tr>`).join('');
- return head('Fleet','Wonder Boxes','18 manifolds across three pilot sites. Select a row to see that box in detail.')+
- `<section class="panel" style="padding:0;overflow:hidden"><div class="tw"><table><thead><tr><th>Box</th><th>Site</th><th>Crop</th><th>Source</th><th>Status</th><th class="r">Use vs need</th><th class="r">EC µS/cm</th><th class="r">pH</th><th class="r">NTU</th><th>Water health</th><th class="r">Last sync</th></tr></thead><tbody>${rows}</tbody></table></div></section>
- ${boxDetail(b)}`;}
-function boxDetail(b){if(b.status==='off')return `<section class="panel"><h3>${b.id} is offline</h3><p class="sub">Last seen 6 hours ago. Data is stored in the box and will sync when signal returns.</p></section>`;
- const R2=k=>RANGES[k];const sp={ec:series(b.ec*.85,60,24,b.ev==='runoff'?260:b.ev==='overpump'?120:0),ph:series(b.ph,.25),turb:series(Math.max(.5,b.turb*.4),1.2,24,b.ev==='runoff'?9:b.ev==='contam'?2:0),press:series(b.press+.3,.25,24,b.ev==='overpump'?-1:0),temp:series(b.temp,1.5)};
- const card=(k,v)=>{const [lo,hi,u,n]=R2(k),s=stOf(v,[lo,hi]);return `<div class="rd2 ${s}"><small>${n}</small><b class="num">${v}<em>${u}</em></b><span>normal ${lo}–${hi} ${u}</span>${spark(sp[k],s==='out'?'var(--crit)':s==='watch'?'var(--warn)':'var(--accent)')}</div>`;};
- const days=['11','12','13','14','15','16','17'],nd=days.map((_,i)=>+(b.need*(0.85+0.3*Math.sin(i))).toFixed(1)),us=days.map((_,i)=>+(i===6?b.used:nd[i]*(0.9+R()*(b.ev==='overpump'?0.8:0.35))).toFixed(1)),mx=Math.max(...nd,...us)*1.1;
- const W=520,H=170,L=34,bw=(W-L-10)/7;const Y=v=>H-24-(v/mx)*(H-44);
- let bars=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Water used versus crop need, last 7 days">`;[0,.5,1].forEach(t=>{const v=mx*t;bars+=`<line x1="${L}" x2="${W-6}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end" font-size="10" fill="var(--ink3)">${fmt(v,0)}</text>`;});
- days.forEach((d,i)=>{const x=L+i*bw+bw*.18,w=bw*.64,over=us[i]>nd[i]*1.15,under=us[i]<nd[i]*.7;bars+=`<rect x="${x}" y="${Y(us[i])}" width="${w}" height="${H-24-Y(us[i])}" rx="4" fill="${over?'var(--warn)':under?'var(--blue)':'var(--accent)'}" fill-opacity=".85"/><line x1="${x-3}" x2="${x+w+3}" y1="${Y(nd[i])}" y2="${Y(nd[i])}" stroke="var(--ink)" stroke-width="2"/><text x="${x+w/2}" y="${H-8}" text-anchor="middle" font-size="10.5" fill="var(--ink2)">${d} Oct</text>`;});bars+='</svg>';
- const evs=EVENTS.filter(e=>e.box===b.id);
- return `<div class="det">
-  <section class="panel"><h3>${b.id} · readings, last 24 hours</h3><p class="sub">${b.site.n} · ${b.crop} · ${b.src} source. Each reading is compared with this source's own normal.</p>
-   <div class="reads">${card('ec',b.ec)}${card('ph',b.ph)}${card('turb',b.turb)}${card('press',b.press)}${card('temp',b.temp)}<div class="rd2"><small>Flow today</small><b class="num">${b.used}<em>m³</em></b><span>crop need ${b.need} m³</span><span style="margin-top:6px;font-weight:600;color:${pctUse(b)>130?'var(--warn)':pctUse(b)<70?'var(--blue)':'var(--good)'}">${pctUse(b)}% of need</span></div></div></section>
-  <section class="panel"><h3>Water used against crop need</h3><p class="sub">Bars: water that flowed. Black line: what the crop needed (weather and crop stage).</p>${bars}
-   <p class="note">Amber bar: more than 15% over need. Blue bar: less than 70% of need.</p></section>
-  <section class="panel"><h3>Water source record</h3><p class="sub">The passport for this source.</p>
-   <dl class="kv"><dt>Source</dt><dd>${b.src}</dd><dt>Serves</dt><dd>${b.crop}, ${b.k==='PMP'?'2.1 ha':'1.6 ha'}</dd><dt>Water health score</dt><dd>${b.score} of 100</dd><dt>Source normal (EC)</dt><dd>${Math.round(b.ec*.82)} µS/cm</dd><dt>Last lab test</dt><dd>${b.id==='WB-SHP-03'?'Sample collected today':'1 Oct · none detected'}</dd><dt>Manifold</dt><dd>4 outlets · valve log on</dd><dt>Power</dt><dd>Solar · battery 87%</dd></dl></section>
-  <section class="panel"><h3>Events at this box</h3><p class="sub">${evs.length?'Named water events, newest first.':'No events in the last 30 days.'}</p><div class="evs">${evs.map(evRow).join('')||'<p class="note">This source is behaving normally.</p>'}</div></section>
- </div>`;}
-function pEvents(){return head('Analyse','Water events','An event is named when several readings move in the same direction, the way Burak Ovine names a disease from a sheep’s blood.')+
- `<section class="panel"><h3>Open and recent</h3><p class="sub">Newest first.</p><div class="evs">${EVENTS.map(evRow).join('')}</div></section>
- <section class="panel"><h3>The five named events</h3><p class="sub">The rules behind each one. Sensors flag; the lab confirms anything chemical.</p><div class="rules">${Object.values(EVT).map(E=>`<div class="rule" style="--ec:${E.c}"><b><i></i>${E.n}</b><p>${E.rule}</p></div>`).join('')}</div></section>`;}
-function pLab(){return head('Confirm','Lab queue','Sensors can’t see pesticides. When an event needs it, and once a month as routine, SKUAST-K’s lab tests a sample and the result is written back to the box.')+
- `<section class="panel" style="padding:0;overflow:hidden"><div class="tw"><table><thead><tr><th>Sample</th><th>Box</th><th>Reason</th><th>Sent</th><th>Test</th><th>Status</th><th>Result</th></tr></thead><tbody>${LAB.map(l=>`<tr data-box="${l.box}"><td class="mono">${l.s}</td><td class="mono">${l.box}</td><td>${l.ev}</td><td>${l.sent}</td><td>${l.test}</td><td><span class="pill ${l.st[0]}">${l.st[1]}</span></td><td>${l.res}</td></tr>`).join('')}</tbody></table></div></section>
- <p class="note">Lab results feed back into the model, so the next contamination watch is sharper.</p>`;}
-function pModel(){return head('How it thinks','The model','Three simple pieces, each one explainable to a farmer and defensible to a scientist.')+
- `<div class="steps">
-  <div><b>1 · Water need</b><p>How much the crop needed today, from weather and crop stage. The standard FAO crop-water method agronomists already use.</p><div class="f">need = ET0 × Kc − effective rain</div></div>
-  <div><b>2 · Water health score</b><p>Each reading compared with that source’s own normal, so a spring and a borewell are each judged fairly.</p><div class="f">z = (reading − source normal) ÷ spread</div></div>
-  <div><b>3 · Named events</b><p>When two or more readings move together in a known pattern, the event is named and the right person is told.</p><div class="f">event = pattern match + timing</div></div>
- </div>
- <section class="panel"><h3>What each reading tells us</h3><p class="sub">Low-cost sensors in the Wonder Box manifold.</p>
-  <div class="tw"><table><thead><tr><th>Reading</th><th>Normal range</th><th>A rise or fall means</th></tr></thead><tbody>
-  <tr><td>Flow</td><td>Set by crop need</td><td>Over- or under-watering; leaks at night</td></tr>
-  <tr><td>Pressure</td><td>1.5–3.0 bar</td><td>Pump strain, over-pumping, blocked outlets</td></tr>
-  <tr><td>Salts (EC)</td><td>150–700 µS/cm</td><td>Runoff, mineral build-up, a borewell drawn too hard</td></tr>
-  <tr><td>pH</td><td>6.5–8.0</td><td>Water that can harm soil and roots</td></tr>
-  <tr><td>Cloudiness (turbidity)</td><td>0–5 NTU</td><td>Silt and runoff after rain or spraying</td></tr>
-  <tr><td>Water temperature</td><td>Season-dependent</td><td>Context for the other readings</td></tr></tbody></table></div>
-  <p class="note" style="margin-top:10px">Ranges are working values for the pilot, to be set with SKUAST-K for each source.</p></section>`;}
-let SHARE={sum:true,ev:true,adv:true,raw:false,lab:true};
-function pLink(){return head('Publish','SKUAST-K link','Burak Cloud does the capture, checking and analysis. SKUAST-K’s platform publishes the results under its own name. You choose exactly what crosses.','<button class="btn pri" type="button" id="pushNow">Send now</button>')+
- `<section class="panel"><h3>Connection</h3><p class="sub">A secure data link from Burak Cloud to SKUAST-K’s software.</p>
-  <div class="link"><div class="end"><b>Burak Cloud</b><small>Wonder Box pipeline · Burak owns the platform</small></div><div class="wire" aria-hidden="true"></div><div class="end"><b>SKUAST-K platform</b><small>Publishes advisories, maps and research · SKUAST-K owns the data</small></div></div></section>
- <div class="grid g2">
-  <section class="panel"><h3>What we share</h3><p class="sub">Each switch controls one kind of record.</p><div class="tog">
-   ${[['sum','Daily summaries','Use vs need and water health score, per box per day'],['ev','Water events','Every named event and its status'],['adv','Farmer advisories','Irrigate, wait or warn, ready to publish'],['lab','Lab results','Pesticide and nitrate results from SKUAST-K’s own lab'],['raw','Raw sensor readings','Every 15-minute reading (large; off by default)']].map(t=>`<label><input type="checkbox" id="sh-${t[0]}" data-sh="${t[0]}" ${SHARE[t[0]]?'checked':''}><span>${t[1]}<small>${t[2]}</small></span></label>`).join('')}
-  </div></section>
-  <section class="panel"><h3>Sent today</h3><p class="sub">Every send is fingerprinted, so both sides can audit it.</p>
-   <div class="log" id="log">${[['09:00','Daily summaries · 17 boxes','62 records'],['06:52','Event E-1042 · Runoff','1 record'],['06:52','Advisory · Shopian growers: avoid WB-SHP-03 source','1 record'],['Yesterday','Event E-1041 · Over-pumping','1 record']].map(r=>`<div><span class="mono">${r[0]}</span><span>${r[1]}</span><span style="color:var(--ink3)">${r[2]}</span></div>`).join('')}</div></section>
- </div>
- <section class="panel"><h3>What a record looks like</h3><p class="sub">One daily summary, as SKUAST-K’s software receives it.</p>
- <div class="code">{
-  "box": "WB-SHP-03",
-  "site": "Shopian",  "crop": "apple, high-density",  "source": "spring",
-  "date": "2026-10-17",
-  "water_m3": { "used": ${BOXES[2].used}, "need": ${BOXES[2].need} },
-  "water_health": ${BOXES[2].score},
-  "readings": { "ec_uS_cm": 812, "ph": ${BOXES[2].ph}, "turbidity_ntu": 11.8, "pressure_bar": ${BOXES[2].press} },
-  "events": ["E-1042 runoff"],
-  "lab": "S-2207 collected",
-  "fingerprint": "b7e1…9c2a",
-  "simulated": true
-}</div></section>`;}
-const R_={ov:pOverview,boxes:pBoxes,events:pEvents,lab:pLab,model:pModel,link:pLink};
-function render(){$('#nav').innerHTML=navHTML();$('#view').innerHTML=R_[page]();$('#crumb').innerHTML=`Wonder Box / <b>${PAGES.find(p=>p[0]===page)[1]}</b>`;}
-let tt;function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2600);}
-document.addEventListener('click',e=>{const n=e.target.closest('[data-p]');if(n){page=n.dataset.p;render();window.scrollTo({top:0});return;}
- const b=e.target.closest('[data-box]');if(b){sel=b.dataset.box;page='boxes';render();const d=document.querySelector('.det');if(d&&e.target.closest('.bx,#view tbody tr'))d.scrollIntoView({behavior:'smooth',block:'start'});return;}
- const tz=e.target.closest('[data-toast]');if(tz){toast(tz.dataset.toast);return;}
- if(e.target.id==='pushNow'){const on=Object.entries(SHARE).filter(([,v])=>v).length;const lg=$('#log');lg.insertAdjacentHTML('afterbegin',`<div><span class="mono">${new Date().toTimeString().slice(0,5)}</span><span>Manual send · ${on} record types</span><span style="color:var(--ink3)">queued</span></div>`);toast('Sent to SKUAST-K. They’ll see it on their platform.');}
- if(e.target.id==='themeBtn'){const r=document.documentElement,cur=r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');r.dataset.theme=cur==='dark'?'light':'dark';}});
-document.addEventListener('change',e=>{const s=e.target.dataset.sh;if(s){SHARE[s]=e.target.checked;toast(`${e.target.closest('label').querySelector('span').firstChild.textContent.trim()} ${e.target.checked?'will be shared':'will not be shared'}.`);}});
+/* Sentinels: fire when 2 of 3 markers are out of line. Fewer than 2 available = insufficient data. */
+const A=(lab,k,fn,show)=>({lab,k,fn,show});
+const above=(k,x)=>(p,i)=>{const v=raw(p,i,k);return v==null?null:v>x;};
+const below=(k,x)=>(p,i)=>{const v=raw(p,i,k);return v==null?null:v<x;};
+const devUp=(k,x)=>(p,i)=>{const d=dev(p,i,k);return d==null?null:d>=x;};
+const devDn=(k,x)=>(p,i)=>{const d=dev(p,i,k);return d==null?null:d<=-x;};
+const SENT=[
+ {id:'MUSCLE',n:'Muscle recovery',c:'--l-muscle',arms:[A('CK above 1,000 U/L on a rested sample','CK',above('CK',1000)),A('LDH above 250 U/L','LDH',above('LDH',250)),A('hs-CRP above 3 mg/L','HSCRP',above('HSCRP',3))]},
+ {id:'OVER',n:'Overreaching',c:'--l-endo',arms:[A('T:C ratio down 30% or more vs personal baseline','TC',devDn('TC',30),'dev'),A('Testosterone down 20% or more vs baseline','TEST',devDn('TEST',20),'dev'),A('Cortisol up 30% or more vs baseline','CORT',devUp('CORT',30),'dev')]},
+ {id:'IRON',n:'Iron & oxygen',c:'--l-oxy',arms:[A('Ferritin below 35 µg/L','FER',below('FER',35)),A('Transferrin saturation below 20%','TSAT',below('TSAT',20)),A('Haemoglobin below 13 g/dL','HB',below('HB',13))]},
+ {id:'HEAT',n:'Hydration & heat',c:'--l-hydr',arms:[A('Urine specific gravity above 1.020','USG',above('USG',1.020)),A('Urea above 7.8 mmol/L','UREA',above('UREA',7.8)),A('Creatinine up 20% or more vs baseline','CREA',devUp('CREA',20),'dev')]},
+ {id:'ENERGY',n:'Energy availability',c:'--l-energy',arms:[A('Free T3 below 3.5 pmol/L or down 20% vs baseline','FT3',(p,i)=>{const v=raw(p,i,'FT3'),d=dev(p,i,'FT3');return v==null?null:(v<3.5||(d!=null&&d<=-20));}),A('Testosterone down 20% or more vs baseline','TEST',devDn('TEST',20),'dev'),A('Fasting glucose below 4.0 mmol/L','GLU',below('GLU',4.0))]},
+ {id:'BONE',n:'Bone & micronutrients',c:'--l-bone',arms:[A('Vitamin D below 50 nmol/L','VITD',below('VITD',50)),A('Calcium below 2.15 mmol/L','CA',below('CA',2.15)),A('Magnesium below 0.70 mmol/L','MG',below('MG',0.70))]},
+ {id:'ILL',n:'Illness & immune',c:'--l-immune',arms:[A('WBC below 4 or above 11 ×10⁹/L','WBC',(p,i)=>{const v=raw(p,i,'WBC');return v==null?null:(v<4||v>11);}),A('NLR above 3','NLR',above('NLR',3)),A('IL-6 above 5 pg/mL','IL6',above('IL6',5))]},
+];
+const MIN_ARMS=2;
+function runSent(p,i,s){const r=s.arms.map(a=>({a,met:a.fn(p,i)}));const av=r.filter(x=>x.met!=null);const met=av.filter(x=>x.met).length;
+  const state=av.length<MIN_ARMS?'insufficient':met>=MIN_ARMS?'detected':met===1?'watch':'clear';return {r,met,av:av.length,state};}
+const SST={detected:['#e0523d','Detected'],watch:['#d39b0c','On watch'],clear:['#1f9d6a','Clear'],insufficient:['#9aa9a3','Insufficient data']};
+
+/* Patterns: named staff-facing patterns, shown as "x of y criteria met" */
+const C=(lab,fn)=>({lab,fn});
+const PAT=[
+ {n:'Non-functional overreaching pattern',need:3,why:'Endocrine stress, inflammation and high match load together',crit:[C('Overreaching sentinel detected',(p,i,S)=>S.OVER.state==='detected'),C('hs-CRP above 3 or IL-6 above 5',(p,i)=>{const a=raw(p,i,'HSCRP'),b=raw(p,i,'IL6');return a==null&&b==null?null:(a>3||b>5);}),C('High match load (300+ minutes in 7 days)',(p,i)=>p.rep[i].ctx.minutes7>=300),C('CK above 1,000 U/L at rest',above('CK',1000))]},
+ {n:'Iron deficiency without anaemia',need:2,why:'Low iron stores while haemoglobin is still normal',crit:[C('Ferritin below 35 µg/L',below('FER',35)),C('Transferrin saturation below 20%',below('TSAT',20)),C('Haemoglobin still 13 g/dL or above',(p,i)=>{const v=raw(p,i,'HB');return v==null?null:v>=13;})]},
+ {n:'Incomplete muscle recovery',need:2,why:'Muscle markers staying high between matches',crit:[C('CK above 1,000 U/L at rest',above('CK',1000)),C('CK above 1,000 at the previous test too',(p,i)=>i===0?null:raw(p,i-1,'CK')>1000),C('LDH above 250 U/L',above('LDH',250))]},
+ {n:'Heat strain & under-hydration',need:2,why:'Concentrated urine and kidney markers during heat exposure',crit:[C('Urine specific gravity above 1.020',above('USG',1.020)),C('Urea above 7.8 or creatinine up 20%+',(p,i)=>{const u=raw(p,i,'UREA'),d=dev(p,i,'CREA');return u==null?null:(u>7.8||(d!=null&&d>=20));}),C('3+ heat sessions in the past week',(p,i)=>p.rep[i].ctx.heat>=3)]},
+ {n:'Low energy availability pattern',need:2,why:'Signs the body is short of fuel for the training load',crit:[C('Energy availability sentinel detected',(p,i,S)=>S.ENERGY.state==='detected'),C('Body mass down 2%+ since the first test',(p,i)=>i===0?null:(p.rep[i].ctx.mass-p.rep[0].ctx.mass)/p.rep[0].ctx.mass*100<=-2),C('Free T3 below 3.5 pmol/L',below('FT3',3.5))]},
+ {n:'Bone health review',need:2,why:'Low vitamin D with other bone-related signals',crit:[C('Vitamin D below 50 nmol/L',below('VITD',50)),C('Calcium below 2.15 or magnesium below 0.70',(p,i)=>{const a=raw(p,i,'CA'),b=raw(p,i,'MG');return a==null&&b==null?null:(a<2.15||b<0.70);}),C('Energy availability sentinel detected or on watch',(p,i,S)=>S.ENERGY.state==='detected'||S.ENERGY.state==='watch')]},
+ {n:'Persistent low-grade inflammation',need:2,why:'Inflammation markers staying raised across rounds without an acute cause',crit:[C('hs-CRP above 3 mg/L now',above('HSCRP',3)),C('hs-CRP above 3 mg/L at the previous round',(p,i)=>i===0?null:raw(p,i-1,'HSCRP')>3),C('IL-6 above 5 pg/mL',above('IL6',5))]},
+ {n:'Recent illness pattern',need:2,why:'Immune markers suggesting a current or recent infection',crit:[C('Illness sentinel detected',(p,i,S)=>S.ILL.state==='detected'),C('hs-CRP above 3 mg/L',above('HSCRP',3)),C('Minutes dropped to zero this week',(p,i)=>p.rep[i].ctx.minutes7===0&&i>0)]},
+];
+/* Links across systems */
+const LINKS=[
+ {a:['Muscle','CK above 1,000'],b:['Inflammation','hs-CRP above 3'],fa:above('CK',1000),fb:above('HSCRP',3),note:'Muscle damage and inflammation together: recovery is lagging behind load.'},
+ {a:['Hydration','USG above 1.020'],b:['Kidney','creatinine up 20%+'],fa:above('USG',1.020),fb:devUp('CREA',20),note:'Under-hydration and kidney markers moving together, common in heat training.'},
+ {a:['Energy','fT3 below 3.5'],b:['Endocrine','T:C down 30%+'],fa:below('FT3',3.5),fb:devDn('TC',30),note:'Low fuel and endocrine stress together: review nutrition and load.'},
+ {a:['Iron','ferritin below 35'],b:['Oxygen','haemoglobin falling 5%+'],fa:below('FER',35),fb:devDn('HB',5),note:'Iron stores low and haemoglobin starting to fall.'},
+ {a:['Vitamin D','below 50 nmol/L'],b:['Muscle','CK above 1,000'],fa:below('VITD',50),fb:above('CK',1000),note:'Low vitamin D alongside slow muscle recovery.'},
+];
+function summary(p,i){const S={};SENT.forEach(s=>S[s.id]=runSent(p,i,s));
+  const pats=PAT.map(pt=>{const r=pt.crit.map(c=>({c,met:c.fn(p,i,S)}));const met=r.filter(x=>x.met===true).length;const chk=r.filter(x=>x.met!=null).length;return {pt,r,met,chk,on:met>=pt.need};});
+  const links=LINKS.map(l=>({l,a:l.fa(p,i),b:l.fb(p,i)})).map(x=>({...x,on:x.a===true&&x.b===true}));
+  const g2=gate2(p,i);const det=SENT.filter(s=>S[s.id].state==='detected').length;const watch=SENT.filter(s=>S[s.id].state==='watch').length;const pon=pats.filter(x=>x.on).length;
+  const status=g2.fired.length?'medical':(det>=2||(pon>=1&&links.some(x=>x.on)))?'review':(det>=1||pon>=1||watch>=1)?'monitor':'clear';
+  return {S,pats,links,g2,det,watch,pon,status};}
+const STATUS={clear:['clear','Clear'],monitor:['monitor','Monitor'],review:['review','Staff review'],medical:['medical','Medical review']};
+const stChip=s=>`<span class="st ${STATUS[s][0]}">${STATUS[s][1]}</span>`;
+/* trend + projection (linear fit on the last 3 tests) */
+const days=d=>Date.parse(d)/864e5;
+function project(p,i,k){const pts=[];for(let j=Math.max(0,i-2);j<=i;j++){const v=raw(p,j,k);if(v!=null)pts.push([days(p.rep[j].d),v]);}
+  if(pts.length<3)return null;const n=pts.length,mx=pts.reduce((a,b)=>a+b[0],0)/n,my=pts.reduce((a,b)=>a+b[1],0)/n;
+  const sl=pts.reduce((a,b)=>a+(b[0]-mx)*(b[1]-my),0)/pts.reduce((a,b)=>a+(b[0]-mx)**2,0);const t=days(p.rep[i].d)+28;return {slope:sl*28,next:my+sl*(t-mx),t};}
+const THR={FER:[35,'below'],TSAT:[20,'below'],VITD:[50,'below'],FT3:[3.5,'below'],HB:[13,'below'],CK:[1000,'above'],HSCRP:[3,'above'],TC:[null],USG:[1.020,'above'],TEST:[8.6,'below'],MG:[0.70,'below']};
+function weeksTo(p,i,k){const pr=project(p,i,k),th=THR[k];if(!pr||!th||th[0]==null)return null;const v=raw(p,i,k);const dir=th[1];
+  if(dir==='below'&&v<th[0])return 0;if(dir==='above'&&v>th[0])return 0;const per=pr.slope/4;if(dir==='below'&&per>=0||dir==='above'&&per<=0)return null;
+  const w=(th[0]-v)/per;return w>0&&w<=26?Math.ceil(w):null;}
+
+/* ======================= STATE & SHELL ======================= */
+const state={view:'dash',pi:1,ri:4,tab:'overview',filter:'All',chartK:'CK',trendK:'CK'};
+const P=DATA;
+const NAVT={dash:['Squad dashboard','Latest round · '+P[0].rep.at(-1).d+' · '+P[0].rep.at(-1).phase],players:['Players','Every player in the squad, highest review status first'],player:['Player analysis','Burak pipeline for one player, one test round'],season:['Season trends','How signals moved across the squad through the season'],method:['Method & evidence','How Burak reads a footballer’s blood tests']};
+function render(){document.querySelectorAll('[data-nav]').forEach(b=>b.setAttribute('aria-current',b.dataset.nav===state.view?'page':'false'));
+  $('ttl').textContent=NAVT[state.view][0];$('sub').textContent=NAVT[state.view][1];
+  $('view').innerHTML=({dash:vDash,players:vPlayers,player:vPlayer,season:vSeason,method:vMethod})[state.view]();}
+const LAST=4;
+const SUMS=()=>P.map((p,pi)=>({p,pi,sm:summary(p,LAST)}));
+function spark(vals,col){const pts=vals.map((v,i)=>[i,v]).filter(x=>x[1]!=null);if(pts.length<2)return '';const w=78,h=22,ys=pts.map(x=>x[1]),a=Math.min(...ys),b=Math.max(...ys);const X=i=>2+i/(vals.length-1)*(w-4),Y=v=>b===a?h/2:h-3-(v-a)/(b-a)*(h-6);
+  return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><polyline fill="none" stroke="${col}" stroke-width="2" points="${pts.map(x=>X(x[0]).toFixed(1)+','+Y(x[1]).toFixed(1)).join(' ')}"/><circle cx="${X(pts.at(-1)[0])}" cy="${Y(pts.at(-1)[1])}" r="2.6" fill="${col}"/></svg>`;}
+function donut(parts){const tot=parts.reduce((a,b)=>a+b[1],0)||1;let a0=-Math.PI/2,s='';const R=52,r=34,cx=64,cy=64;
+  parts.forEach(([lab,v,col])=>{if(!v)return;const a1=a0+v/tot*Math.PI*2;const lg=a1-a0>Math.PI?1:0;const p=(a,rr)=>[cx+rr*Math.cos(a),cy+rr*Math.sin(a)];const [x0,y0]=p(a0,R),[x1,y1]=p(a1,R),[x2,y2]=p(a1,r),[x3,y3]=p(a0,r);
+   s+=v===tot?`<circle cx="${cx}" cy="${cy}" r="${(R+r)/2}" fill="none" stroke="${col}" stroke-width="${R-r}"/>`:`<path d="M${x0},${y0} A${R},${R} 0 ${lg} 1 ${x1},${y1} L${x2},${y2} A${r},${r} 0 ${lg} 0 ${x3},${y3}Z" fill="${col}"/>`;a0=a1;});
+  return `<svg width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="Squad status">${s}<text x="64" y="62" text-anchor="middle" style="font:700 22px var(--display);fill:var(--ink)">${tot}</text><text x="64" y="80" text-anchor="middle" class="ax" style="font-size:11px;fill:var(--muted)">players</text></svg>`;}
+
+/* ======================= WOW: line strain radar, pitch board ======================= */
+const SEVP={ok:0,na:0,md:45,lo:85,hi:85,ac:100};
+function strain(p,i,l){const ks=Object.keys(M).filter(k=>M[k].l===l);const pts=ks.map(k=>SEVP[tier(p,i,k).s]??0);if(!pts.length)return 0;const avg=pts.reduce((a,b)=>a+b,0)/pts.length,mx=Math.max(...pts);return Math.round(.5*avg+.5*mx);}
+function radar(p,i){const N=LINES.length,cx=190,cy=170,R=118;const ang=j=>-Math.PI/2+j*2*Math.PI/N;const pt=(j,v)=>[cx+Math.cos(ang(j))*R*v/100,cy+Math.sin(ang(j))*R*v/100];
+  let g='';[25,50,75,100].forEach(v=>{g+=`<polygon points="${LINES.map((_,j)=>pt(j,v).join(',')).join(' ')}" fill="none" stroke="#e3ebe7"/>`;});
+  LINES.forEach(([l,name,col],j)=>{const [x,y]=pt(j,100);g+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#e3ebe7"/>`;const [lx,ly]=pt(j,124);const sv=strain(p,i,l);g+=`<text x="${lx}" y="${ly}" text-anchor="${lx<cx-8?'end':lx>cx+8?'start':'middle'}" dominant-baseline="middle" style="font:600 11.5px var(--body);fill:${sv>=60?'#a5291b':'var(--ink)'}">${name.split(' ')[0].replace('&','')}</text>`;});
+  const first=LINES.map(([l],j)=>pt(j,Math.max(4,strain(p,0,l))).join(',')).join(' ');const now=LINES.map(([l],j)=>pt(j,Math.max(4,strain(p,i,l))).join(',')).join(' ');
+  g+=`<polygon points="${first}" fill="rgba(24,167,122,.12)" stroke="#18a77a" stroke-dasharray="4 3" stroke-width="1.5"/><polygon points="${now}" fill="rgba(224,82,61,.22)" stroke="#e0523d" stroke-width="2.2"/>`;
+  LINES.forEach(([l,,col],j)=>{const [x,y]=pt(j,Math.max(4,strain(p,i,l)));g+=`<circle cx="${x}" cy="${y}" r="4.5" fill="var(${col})" stroke="#fff" stroke-width="1.5"><title>${LINES[j][1]}: strain ${strain(p,i,l)}</title></circle>`;});
+  return `<svg viewBox="0 0 380 340" width="100%" style="max-width:420px" role="img" aria-label="Body-system strain radar">${g}</svg>`;}
+const SLOTS={'DFC-01':[50,92],'DFC-03':[16,72],'DFC-04':[38,76],'DFC-05':[62,76],'DFC-02':[84,72],'DFC-16':[50,60],'DFC-08':[28,46],'DFC-14':[50,44],'DFC-06':[72,46],'DFC-11':[14,26],'DFC-18':[86,26],'DFC-09':[40,14],'DFC-10':[60,14],'DFC-17':[50,28]};
+const SCOL={clear:'#1f9d6a',monitor:'#f2b91f',review:'#e0523d',medical:'#8f1d2c'};
+function pitch(A){const W=600,H=760,X=x=>30+x/100*(W-60),Y=y=>24+y/100*(H-48);
+  let g=`<rect x="0" y="0" width="${W}" height="${H}" rx="18" fill="#0f4a37"/>`;for(let k=0;k<8;k++)g+=`<rect x="12" y="${12+k*(H-24)/8}" width="${W-24}" height="${(H-24)/16}" fill="#115540"/>`;
+  g+=`<g fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"><rect x="12" y="12" width="${W-24}" height="${H-24}" rx="4"/><line x1="12" y1="${H/2}" x2="${W-12}" y2="${H/2}"/><circle cx="${W/2}" cy="${H/2}" r="62"/><rect x="${W/2-130}" y="12" width="260" height="110"/><rect x="${W/2-60}" y="12" width="120" height="40"/><rect x="${W/2-130}" y="${H-122}" width="260" height="110"/><rect x="${W/2-60}" y="${H-52}" width="120" height="40"/><path d="M${W/2-55},122 A62,62 0 0 0 ${W/2+55},122"/><path d="M${W/2-55},${H-122} A62,62 0 0 1 ${W/2+55},${H-122}"/></g>`;
+  A.forEach(x=>{const s=SLOTS[x.p.id];if(!s)return;const cx=X(s[0]),cy=Y(s[1]);const st=x.sm.status;const top=SENT.filter(z=>x.sm.S[z.id].state==='detected').map(z=>z.n);
+   g+=`<g class="pl" data-open="${x.pi}" tabindex="0" role="button" aria-label="${x.p.id}, ${STATUS[st][1]}" style="cursor:pointer">${st!=='clear'?`<circle cx="${cx}" cy="${cy}" r="30" fill="${SCOL[st]}" opacity=".25" class="pulse"/>`:''}<circle cx="${cx}" cy="${cy}" r="22" fill="${SCOL[st]}" stroke="#fff" stroke-width="2.5"/><text x="${cx}" y="${cy+5}" text-anchor="middle" style="font:700 16px var(--display);fill:#fff">${x.p.id.slice(4)}</text>
+   <text x="${cx}" y="${cy+40}" text-anchor="middle" style="font:600 13px var(--body);fill:#fff">${x.p.pos.replace('Central midfielder','CM').replace('Defensive midfielder','DM').replace('Centre-back','CB').replace('Full-back','FB').replace('Goalkeeper','GK').replace('Winger','W').replace('Striker','ST')}${top.length?' · '+top[0]:''}</text><title>${x.p.id} · ${STATUS[st][1]}${top.length?' · '+top.join(', '):''}</title></g>`;});
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:560px;display:block;margin:0 auto" role="img" aria-label="Squad readiness on the pitch">${g}</svg>`;}
+/* ======================= VIEWS ======================= */
+function vDash(){const A=SUMS();const cnt=k=>A.filter(x=>x.sm.status===k).length;
+  const g2season=P.reduce((n,p)=>n+p.rep.reduce((m,_,i)=>m+(gate2(p,i).fired.length?1:0),0),0);
+  const heat=A.map(x=>`<tr class="rowlink" tabindex="0" data-open="${x.pi}"><td><b>${x.p.id}</b><div class="small">${x.p.pos}</div></td>${SENT.map(s=>{const st=x.sm.S[s.id].state;return `<td class="h"><i title="${s.n}: ${SST[st][1]}" style="background:${st==='detected'?'#e0523d':st==='watch'?'#f2c14e':st==='clear'?'#cfe9dc':'#e3e8e6'}"></i></td>`;}).join('')}<td>${stChip(x.sm.status)}</td></tr>`).join('');
+  const alerts=[];A.forEach(x=>{x.sm.g2.fired.forEach(f=>alerts.push([0,'#8f1d2c',`<b>${x.p.id}</b> · ${f.g.lab}: ${f.g.why}.`]));SENT.forEach(s=>{if(x.sm.S[s.id].state==='detected')alerts.push([1,'#e0523d',`<b>${x.p.id}</b> · ${s.n} sentinel detected (${x.sm.S[s.id].met} of 3 markers).`]);});x.sm.pats.filter(z=>z.on).forEach(z=>alerts.push([2,'#d39b0c',`<b>${x.p.id}</b> · ${z.pt.n}: ${z.met} of ${z.pt.crit.length} criteria met.`]));});
+  alerts.sort((a,b)=>a[0]-b[0]);
+  const med=k=>P[0].rep.map((_,i)=>{const xs=P.map(p=>raw(p,i,k)).filter(v=>v!=null).sort((a,b)=>a-b);return xs[Math.floor(xs.length/2)];});
+  const sentCnt=SENT.map(s=>[s,A.filter(x=>x.sm.S[s.id].state==='detected').length,A.filter(x=>x.sm.S[s.id].state==='watch').length]);
+  return `<div class="grid g4">
+   <div class="kpi" style="background:var(--pitch)"><span class="l">Squad tested</span><span class="n">${P.length}</span><span class="s">Round 5 of 5 · ${P[0].rep[LAST].d}</span></div>
+   <div class="kpi" style="background:var(--review)"><span class="l">Staff or medical review</span><span class="n">${cnt('review')+cnt('medical')}</span><span class="s">Two or more signals together</span></div>
+   <div class="kpi" style="background:var(--watch)"><span class="l">Monitor</span><span class="n">${cnt('monitor')}</span><span class="s">One signal, pattern or watch</span></div>
+   <div class="kpi" style="background:var(--medical)"><span class="l">Safety alerts this season</span><span class="n">${g2season}</span><span class="s">Gate 2 checks, all rounds</span></div></div>
+  <div class="grid gpitch"><div class="card" style="background:linear-gradient(180deg,#0d3b2e,#0f4a37);color:#fff;border:0"><h3 style="color:#fff">Readiness board</h3><div class="sub" style="color:#a9d3c2">Every player in position · tap a player to open his analysis</div><div style="margin-top:12px">${pitch(A)}</div>
+   <div class="legend" style="margin-top:12px;color:#cfe6dc">${[['Clear','#1f9d6a'],['Monitor','#f2b91f'],['Staff review','#e0523d'],['Medical review','#8f1d2c']].map(([l,c])=>`<span><i style="background:${c}"></i>${l}</span>`).join('')}</div></div>
+   <div style="display:flex;flex-direction:column;gap:16px;min-width:0"><div class="card"><h3>Squad status</h3><div class="sub">Latest round</div><div style="display:flex;gap:16px;align-items:center;margin-top:10px;flex-wrap:wrap">${donut([['Clear',cnt('clear'),'#1f9d6a'],['Monitor',cnt('monitor'),'#d39b0c'],['Staff review',cnt('review'),'#e0523d'],['Medical review',cnt('medical'),'#8f1d2c']])}
+   <div class="legend" style="flex-direction:column;gap:6px">${[['Clear','clear','#1f9d6a'],['Monitor','monitor','#d39b0c'],['Staff review','review','#e0523d'],['Medical review','medical','#8f1d2c']].map(([l,k,c])=>`<span><i style="background:${c}"></i>${l} <b class="num">${cnt(k)}</b></span>`).join('')}</div></div></div>
+   <div class="card"><h3>Which signals are active now</h3><div class="sub">Players with each sentinel detected or on watch</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">${sentCnt.map(([s,d,w])=>`<div style="display:grid;grid-template-columns:150px 1fr 60px;gap:10px;align-items:center"><span style="font-weight:600">${s.n}</span><span style="display:flex;height:14px;border-radius:7px;overflow:hidden;background:#eef2f0"><i style="width:${d/P.length*100}%;background:var(${s.c})"></i><i style="width:${w/P.length*100}%;background:var(${s.c});opacity:.35"></i></span><span class="small num">${d} · ${w}</span></div>`).join('')}</div>
+    <div class="legend" style="margin-top:10px"><span><i style="background:#555"></i>Detected</span><span><i style="background:#555;opacity:.35"></i>On watch</span></div></div>
+   <div class="card"><h3>For staff today</h3><div class="sub">Safety alerts first, then sentinels and patterns</div><div style="margin-top:6px;max-height:330px;overflow:auto">${alerts.length?alerts.map(a=>`<div class="alert"><span class="dot" style="background:${a[1]}"></span><span>${a[2]}</span></div>`).join(''):'<p class="small">No active signals.</p>'}</div></div></div></div>
+  <div class="card"><h3>Squad signal map</h3><div class="sub">Each player against the seven sentinels · click a row to open the player</div>
+   <div class="tw" style="margin-top:8px"><table class="heat"><thead><tr><th>Player</th>${SENT.map(s=>`<th style="text-align:center">${s.n}</th>`).join('')}<th>Status</th></tr></thead><tbody>${heat}</tbody></table></div>
+   <div class="legend" style="margin-top:10px"><span><i style="background:#e0523d"></i>Detected</span><span><i style="background:#f2c14e"></i>On watch</span><span><i style="background:#cfe9dc"></i>Clear</span><span><i style="background:#e3e8e6"></i>Insufficient data</span></div></div>
+  <div class="grid g3">${[['CK','Squad median CK','U/L'],['FER','Squad median ferritin','µg/L'],['VITD','Squad median vitamin D','nmol/L']].map(([k,t,u])=>`<div class="card"><h3>${t}</h3><div class="sub">${u} · five test rounds</div>${miniLine(med(k),k)}</div>`).join('')}</div>`;}
+function miniLine(vals,k){const W=320,H=120,pl=34,pr=10,pt=10,pb=22;const a=Math.min(...vals),b=Math.max(...vals),pad=(b-a)*.25||1;const lo=Math.max(0,a-pad),hi=b+pad;
+  const X=i=>pl+i/(vals.length-1)*(W-pl-pr),Y=v=>pt+(1-(v-lo)/(hi-lo))*(H-pt-pb);let g='';for(let j=0;j<=2;j++){const v=lo+(hi-lo)*j/2;g+=`<line class="gl" x1="${pl}" x2="${W-pr}" y1="${Y(v)}" y2="${Y(v)}"/><text class="ax" x="${pl-5}" y="${Y(v)+3.5}" text-anchor="end">${fmt(k,v)}</text>`;}
+  P[0].rep.forEach((r,i)=>g+=`<text class="ax" x="${X(i)}" y="${H-6}" text-anchor="middle">${r.d.slice(5,7)==='07'?'Jul':r.d.slice(5,7)==='08'?'Aug':r.d.slice(5,7)==='09'?'Sep':r.d.slice(5,7)==='10'?'Oct':'Nov'}</text>`);
+  return `<svg class="ch" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Trend">${g}<polyline class="ln" points="${vals.map((v,i)=>X(i)+','+Y(v)).join(' ')}"/>${vals.map((v,i)=>`<circle class="pt" cx="${X(i)}" cy="${Y(v)}" r="3.5"><title>${fmt(k,v)}</title></circle>`).join('')}</svg>`;}
+function vPlayers(){const A=SUMS();const ord={medical:0,review:1,monitor:2,clear:3};const f=state.filter;
+  const list=A.filter(x=>f==='All'||STATUS[x.sm.status][1]===f).sort((a,b)=>ord[a.sm.status]-ord[b.sm.status]||b.sm.det-a.sm.det);
+  const cnt=l=>A.filter(x=>STATUS[x.sm.status][1]===l).length;
+  return `<div class="selrow" role="group" aria-label="Filter by status">${['All','Medical review','Staff review','Monitor','Clear'].map(l=>`<button class="pill" data-filter="${l}" aria-pressed="${f===l}">${l} <span class="num">${l==='All'?P.length:cnt(l)}</span></button>`).join('')}</div>
+  <div class="card" style="padding:0"><div class="tw"><table><thead><tr><th>Player</th><th>Position</th><th>Age</th><th>Active signals</th><th>CK · 5 rounds</th><th>T:C · vs baseline</th><th>Ferritin</th><th>Vitamin D</th><th>Minutes (7 d)</th><th>Status</th></tr></thead><tbody>
+  ${list.map(x=>{const p=x.p,sm=x.sm;const act=SENT.filter(s=>sm.S[s.id].state==='detected').map(s=>s.n);const tcd=dev(p,LAST,'TC');
+   return `<tr class="rowlink" tabindex="0" data-open="${x.pi}"><td><b>${p.id}</b><div class="small" style="max-width:240px">${esc(p.note)}</div></td><td>${p.pos}</td><td class="num">${p.age}</td>
+   <td>${act.length?act.map(a=>`<span class="small" style="display:inline-block;background:#fde9e5;color:#a5291b;border-radius:6px;padding:1px 7px;margin:1px;font-weight:600">${a}</span>`).join(''):'<span class="small">None</span>'}</td>
+   <td>${spark(p.rep.map((_,i)=>raw(p,i,'CK')),'#e0523d')} <b class="num">${fmt('CK',raw(p,LAST,'CK'))}</b></td>
+   <td><span class="dev ${tcd<=-20?'down':'flat'}">${sgn(tcd)}</span></td><td class="num">${fmt('FER',raw(p,LAST,'FER'))}</td><td class="num">${fmt('VITD',raw(p,LAST,'VITD'))}</td><td class="num">${p.rep[LAST].ctx.minutes7}</td><td>${stChip(sm.status)}</td></tr>`;}).join('')||'<tr><td colspan="10" class="small">No players with this status.</td></tr>'}
+  </tbody></table></div></div>`;}
+const TABS=[['overview','Overview'],['marker','Marker profile'],['sentinel','Sentinels'],['pattern','Patterns'],['links','Links'],['trend','Trends & projection'],['report','Staff report']];
+function vPlayer(){const p=P[state.pi],i=state.ri,sm=summary(p,i);const c=p.rep[i].ctx;
+  return `<div class="ph"><div class="av">${p.pos.split(' ').map(w=>w[0]).join('').slice(0,2)}</div><div><h2>${p.id}</h2><div class="meta">${p.pos} · ${p.age} years · ${c.minutes7} minutes in 7 days · ${c.heat} heat sessions · ${c.mass} kg</div></div>
+   <div style="display:flex;gap:8px;flex-wrap:wrap;position:relative;z-index:1"><select id="psel" aria-label="Player">${P.map((q,k)=>`<option value="${k}" ${k===state.pi?'selected':''}>${q.id} · ${q.pos}</option>`).join('')}</select>
+   <select id="rsel" aria-label="Test round">${p.rep.map((r,k)=>`<option value="${k}" ${k===i?'selected':''}>Round ${k+1} · ${r.d} · ${r.phase}</option>`).join('')}</select></div>
+   <div class="rk"><div class="small" style="color:#bfe0d2">STATUS</div>${stChip(sm.status)}</div></div>
+  ${gateBox(p,i,sm)}
+  <div class="tabs" role="tablist">${TABS.map(t=>`<button class="tab" role="tab" data-tab="${t[0]}" aria-selected="${state.tab===t[0]}">${t[1]}</button>`).join('')}</div>
+  ${({overview:tOver,marker:tMarker,sentinel:tSent,pattern:tPat,links:tLinks,trend:tTrend,report:tReport})[state.tab](p,i,sm)}`;}
+function gateBox(p,i,sm){const f=sm.g2.fired,ne=sm.g2.rules.filter(r=>r.st==='NOT_EVALUATED');
+  return f.length?`<div class="gate fire" role="alert"><div><b>Gate 2 · Safety alert</b><div>${f.map(x=>`${x.g.lab}: ${x.g.why}.`).join(' ')} Signals below are shown, but treat scores as not interpretable until the medical team has reviewed this player.</div></div></div>`
+   :`<div class="gate clear"><div><b>Gate 2 · No safety alert.</b> ${GATE2.length-ne.length} of ${GATE2.length} checks run${ne.length?`; not evaluated: ${ne.map(x=>x.g.id).join(', ')} (needs an earlier result)`:''}. <span class="small">Gate 1: ${gate1(p,i)} (label only).</span></div></div>`;}
+function gauge(k,v){const t=M[k].t;if(!t)return '';const b=t.map(x=>x[0]).filter(isFinite);const sp=(b.at(-1)-b[0])||b[0];let lo=Math.max(0,b[0]-sp*.4),hi=b.at(-1)+sp*.4;if(b.length===1){lo=b[0]*.5;hi=b[0]*1.5;}if(k==='USG'){lo=1.000;hi=1.035;}
+  if(v>hi)hi=v*1.05;if(v<lo)lo=v*.95;const C={ok:'#9ad9bb',md:'#f6d77b',hi:'#f3a395',lo:'#a5c3f0',ac:'#e58a99'};let prev=lo,segs='';t.forEach(x=>{const end=isFinite(x[0])?Math.min(x[0],hi):hi;const w=Math.max(0,end-Math.max(prev,lo))/(hi-lo)*100;if(w>0)segs+=`<span style="width:${w}%;background:${C[x[2]]}"></span>`;prev=Math.max(prev,end);});
+  return `<div class="gwrap" aria-hidden="true"><div class="gauge">${segs}</div><i style="left:${Math.max(2,Math.min(98,(v-lo)/(hi-lo)*100))}%"></i></div>`;}
+const rng=k=>{const t=M[k].t;if(!t)return 'down ≥30% vs baseline flagged';const ok=t.map((x,i)=>({x,lo:i?t[i-1][0]:null})).filter(o=>o.x[2]==='ok');if(!ok.length)return '';const a=ok[0].lo,b=ok.at(-1).x[0];return a==null?`below ${fmt(k,b)}`:!isFinite(b)?`${fmt(k,a)} or above`:`${fmt(k,a)}–${fmt(k,b)}`;};
+function tOver(p,i,sm){const tl=p.rep.map((r,j)=>({r,j,st:summary(p,j).status}));
+  const ch=i===0?[]:Object.keys(M).map(k=>({k,d:dev(p,i,k),t:tier(p,i,k)})).filter(x=>x.d!=null&&Math.abs(x.d)>=15).sort((a,b)=>Math.abs(b.d)-Math.abs(a.d)).slice(0,5);
+  const pj=TK.map(k=>({k,w:weeksTo(p,i,k),pr:project(p,i,k)})).filter(x=>x.w&&x.w>0);const det=SENT.filter(s=>sm.S[s.id].state==='detected');const pats=sm.pats.filter(x=>x.on);
+  return `<div class="grid g2"><div class="card"><h3>Body-system strain</h3><div class="sub">Red: this round · green dashed: first round (pre-season). Further out = more markers out of line.</div><div style="display:flex;justify-content:center;margin-top:6px">${radar(p,i)}</div></div>
+  <div style="display:flex;flex-direction:column;gap:16px;min-width:0"><div class="card"><h3>Season so far</h3><div class="sub">Status at each test round · click a round to open it</div>
+   <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:12px">${tl.map(x=>`<button class="pill" data-round="${x.j}" aria-pressed="${x.j===i}" style="display:flex;flex-direction:column;align-items:center;gap:6px;border-radius:10px;padding:10px 4px"><span class="small" style="${x.j===i?'color:#cfe6dc':''}">${x.r.d.slice(5)}</span><span style="width:16px;height:16px;border-radius:50%;background:${SCOL[x.st]};box-shadow:0 0 0 3px ${x.j===i?'rgba(255,255,255,.35)':'#eef2f0'}"></span><span style="font-size:10.5px;font-weight:600;text-align:center;line-height:1.2">${STATUS[x.st][1]}</span></button>`).join('')}</div></div>
+   <div class="card"><h3>What Burak sees now</h3><ul style="margin:8px 0 0;padding-left:18px">${sm.g2.fired.length?`<li style="color:var(--medical)"><b>Safety alert:</b> ${sm.g2.fired.map(x=>x.g.lab).join('; ')}.</li>`:''}<li>${det.length?`<b>${det.map(s=>s.n).join(', ')}</b> sentinel${det.length>1?'s':''} detected.`:'No sentinel detected.'}</li>${pats.map(x=>`<li>${x.pt.n} (${x.met} of ${x.pt.crit.length} criteria met).</li>`).join('')}${pj.map(x=>`<li>${M[x.k].full} on course to cross its signal line in about <b>${x.w} weeks</b>.</li>`).join('')}</ul></div></div></div>
+  <div class="card"><h3>Biggest changes against his own baseline</h3><div class="sub">${i===0?'First round: this is his baseline.':'Changes of 15% or more since earlier rounds'}</div>
+   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-top:12px">${ch.length?ch.map(x=>`<div style="border:1px solid var(--line);border-radius:10px;padding:10px 12px"><div class="small">${M[x.k].full}</div><div style="display:flex;align-items:baseline;gap:8px;margin-top:2px"><b style="font:700 22px var(--display)" class="num">${fmt(x.k,raw(p,i,x.k))}</b><span class="small">${M[x.k].u}</span></div><span class="dev ${x.d>0?'up':'down'}">${x.d>0?'▲':'▼'} ${sgn(x.d)}</span> ${spark(p.rep.map((_,j)=>raw(p,j,x.k)),x.d>0?'#e0523d':'#2f7fd6')}</div>`).join(''):'<p class="small">No large changes.</p>'}</div></div>`;}
+function tMarker(p,i){return LINES.map(([l,name,col])=>{const ks=Object.keys(M).filter(k=>M[k].l===l);
+  return `<div class="card" style="padding:12px 14px"><div class="ln-head"><i style="background:var(${col})"></i><h3>${name}</h3><span class="small" style="margin-left:auto">${ks.filter(k=>flagged(tier(p,i,k).s)).length} of ${ks.length} flagged</span></div>
+  <div class="tw"><table><thead><tr><th>Marker</th><th>Range</th><th>Where it sits</th><th>Result</th><th>vs personal baseline</th><th>5 rounds</th></tr></thead><tbody>
+  ${ks.map(k=>{const v=raw(p,i,k),t=tier(p,i,k),d=dev(p,i,k);return `<tr><td><b>${M[k].n}</b><div class="small">${M[k].full}${M[k].calc?' (calculated)':''}</div></td><td class="small">${rng(k)} ${M[k].u}</td><td>${gauge(k,v)}</td>
+   <td><span class="val ${t.s==='na'?'ok':t.s}">${fmt(k,v)}<small>${t.lab}</small></span></td><td><span class="dev ${d==null||Math.abs(d)<10?'flat':d>0?'up':'down'}">${i===0?'baseline round':sgn(d)}</span></td><td>${spark(p.rep.map((_,j)=>raw(p,j,k)),`var(${col})`)}</td></tr>`;}).join('')}</tbody></table></div></div>`;}).join('')+`<p class="small">Personal baseline = the average of this player’s earlier rounds. Ranges are illustrative sports-science values until reviewed by the club’s medical team.</p>`;}
+function tSent(p,i,sm){return `<div class="grid g2">${SENT.map(s=>{const o=sm.S[s.id];const [col,lab]=SST[o.state];
+  return `<div class="sent"><div class="hd" style="background:var(${s.c})"><b>${s.n.toUpperCase()}</b><span class="s">${lab}</span></div><div class="arms">${o.r.map(x=>{const k=x.a.k;const v=raw(p,i,k),d=dev(p,i,k);return `<div class="arm"><span class="b ${x.met===true?'y':x.met===false?'n':'q'}">${x.met===true?'!':x.met===false?'✓':'–'}</span><span>${x.a.lab}</span><span class="v">${x.a.show==='dev'?(d==null?'needs baseline':sgn(d)):fmt(k,v)+' '+M[k].u}</span></div>`;}).join('')}
+  <div class="small" style="margin-top:4px">${o.met} of ${o.av} available markers out of line · fires at 2</div></div></div>`;}).join('')}</div>`;}
+const PICON={'Non-functional overreaching pattern':'LOAD','Iron deficiency without anaemia':'IRON','Incomplete muscle recovery':'MUSCLE','Heat strain & under-hydration':'HEAT','Low energy availability pattern':'FUEL','Bone health review':'BONE','Persistent low-grade inflammation':'CRP','Recent illness pattern':'ILLNESS'};
+function ring(met,tot,need,on){const R=30,C=2*Math.PI*R;const f=met/tot;const nd=need/tot;const col=on?'#e0523d':met?'#d39b0c':'#1f9d6a';
+  return `<svg width="84" height="84" viewBox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="${R}" fill="none" stroke="#edf2ef" stroke-width="9"/><circle cx="42" cy="42" r="${R}" fill="none" stroke="${col}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${(f*C).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 42 42)"/>
+  <line x1="${42+Math.cos(-Math.PI/2+nd*2*Math.PI)*(R-7)}" y1="${42+Math.sin(-Math.PI/2+nd*2*Math.PI)*(R-7)}" x2="${42+Math.cos(-Math.PI/2+nd*2*Math.PI)*(R+7)}" y2="${42+Math.sin(-Math.PI/2+nd*2*Math.PI)*(R+7)}" stroke="#10231d" stroke-width="2"/>
+  <text x="42" y="40" text-anchor="middle" style="font:700 19px var(--display);fill:var(--ink)">${met}/${tot}</text><text x="42" y="55" text-anchor="middle" style="font:600 9px var(--body);fill:var(--muted)">CRITERIA</text></svg>`;}
+function tPat(p,i,sm){const hist=PAT.map((pt,k)=>p.rep.map((_,j)=>summary(p,j).pats[k]));
+  const on=sm.pats.filter(x=>x.on).length;
+  return `<div class="card" style="display:flex;gap:18px;align-items:center;flex-wrap:wrap"><div><h3>${on?`${on} pattern${on>1?'s':''} to discuss with staff`:'No pattern present this round'}</h3><div class="sub">A pattern is a set of signals worth reviewing together. The ring shows criteria met; the tick on the ring marks how many are needed.</div></div>
+   <div class="legend" style="margin-left:auto"><span><i style="background:#e0523d"></i>Pattern present</span><span><i style="background:#d39b0c"></i>Building</span><span><i style="background:#1f9d6a"></i>Not present</span></div></div>
+  <div class="grid g2">${sm.pats.map((x,k)=>{const col=x.on?'#e0523d':x.met?'#d39b0c':'#1f9d6a';return `<div class="patc ${x.on?'on':''}" style="--pc:${col}">
+   <div class="pt-top">${ring(x.met,x.pt.crit.length,x.pt.need,x.on)}<div style="min-width:0"><div class="pt-ico">${PICON[x.pt.n]||'•'}</div><h4>${x.pt.n}</h4><div class="small">${x.pt.why}</div>
+   <span class="pt-badge">${x.on?'Pattern present':x.met?'Building':'Not present'}</span></div></div>
+   <div class="pt-crit">${x.r.map(r=>`<div class="cr ${r.met===true?'y':r.met===false?'n':'q'}"><span class="ic">${r.met===true?'!':r.met===false?'✓':'?'}</span><span>${r.c.lab}${r.met==null?' <em>(not available yet)</em>':''}</span></div>`).join('')}</div>
+   <div class="pt-hist"><span class="small">Season</span>${hist[k].map((h,j)=>`<span class="hd ${h.on?'on':h.met?'b':''} ${j===i?'cur':''}" title="${p.rep[j].d}: ${h.met} of ${h.pt.crit.length}">${p.rep[j].d.slice(5)}</span>`).join('')}</div></div>`;}).join('')}</div>`;}
+const NODES=[['Muscle','--l-muscle'],['Inflammation','--l-inflam'],['Hydration','--l-hydr'],['Kidney','--l-hydr'],['Energy','--l-energy'],['Endocrine','--l-endo'],['Iron','--l-oxy'],['Oxygen','--l-oxy'],['Vitamin D','--l-bone']];
+function tLinks(p,i,sm){const W=760,H=470,cx=W/2,cy=H/2+4,R=178;const pos={};NODES.forEach(([n],j)=>{const a=-Math.PI/2+j*2*Math.PI/NODES.length;pos[n]=[cx+Math.cos(a)*R*1.45,cy+Math.sin(a)*R];});
+  const nodeOn={};sm.links.forEach(x=>{if(x.a)nodeOn[x.l.a[0]]=1;if(x.b)nodeOn[x.l.b[0]]=1;});
+  let g=`<defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`;
+  const hub=`<circle cx="${cx}" cy="${cy}" r="58" fill="#0f4a37" stroke="#fff" stroke-width="4"/><text x="${cx}" y="${cy-4}" text-anchor="middle" style="font:700 15px var(--display);fill:#fff">${p.id}</text><text x="${cx}" y="${cy+14}" text-anchor="middle" style="font:600 10.5px var(--body);fill:#a9d3c2">${sm.links.filter(x=>x.on).length} active link${sm.links.filter(x=>x.on).length===1?'':'s'}</text>`;
+  NODES.forEach(([n])=>{const [x,y]=pos[n];g+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="${nodeOn[n]?'rgba(224,82,61,.35)':'#e6eeea'}" stroke-width="${nodeOn[n]?2:1.2}"/>`;});
+  sm.links.forEach(x=>{const [x1,y1]=pos[x.l.a[0]],[x2,y2]=pos[x.l.b[0]];const mx=(x1+x2)/2,my=(y1+y2)/2;const qx=mx+(cx-mx)*.55,qy=my+(cy-my)*.55;
+   const half=x.a||x.b;g+=`<path d="M${x1},${y1} Q${qx},${qy} ${x2},${y2}" fill="none" stroke="${x.on?'#e0523d':half?'#e9b949':'#cfdcd6'}" stroke-width="${x.on?5:half?3:2}" ${x.on?'filter="url(#glow)"':''} stroke-dasharray="${x.on?'none':half?'7 5':'3 6'}" stroke-linecap="round"><title>${x.l.a[0]} ⟷ ${x.l.b[0]}: ${x.on?'both present':half?'one side present':'not present'}</title></path>`;
+   if(x.on)g+=`<circle r="5" fill="#fff" stroke="#e0523d" stroke-width="2"><animateMotion dur="2.4s" repeatCount="indefinite" path="M${x1},${y1} Q${qx},${qy} ${x2},${y2}"/></circle>`;});
+  g+=hub;
+  NODES.forEach(([n,c])=>{const [x,y]=pos[n];const on=nodeOn[n];g+=`<g><circle cx="${x}" cy="${y}" r="${on?42:38}" fill="${on?`var(${c})`:'#fff'}" stroke="var(${c})" stroke-width="3"/><text x="${x}" y="${y+4}" text-anchor="middle" style="font:700 ${n.length>9?10.5:12}px var(--body);fill:${on?'#fff':'var(--ink)'}">${n}</text></g>`;});
+  return `<div class="card"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><h3>Links across body systems</h3><div class="sub">When two systems are out of line together, the link lights up. Signals of co-occurrence, not cause.</div></div>
+   <div class="legend"><span><i style="background:#e0523d"></i>Both sides present</span><span><i style="background:#e9b949"></i>One side present</span><span><i style="background:#cfdcd6"></i>Not present</span></div></div>
+   <div class="tw"><svg viewBox="0 0 ${W} ${H}" width="100%" style="min-width:520px;max-width:900px;display:block;margin:6px auto 0" role="img" aria-label="Body-system links">${g}</svg></div></div>
+  <div class="grid g2">${sm.links.map(x=>`<div class="lkc ${x.on?'on':x.a||x.b?'half':''}"><div class="lkr"><span class="nd ${x.a?'y':''}"><b>${x.l.a[0]}</b><small>${x.l.a[1]}</small></span><span class="ar">${x.on?'⟷':'⋯'}</span><span class="nd ${x.b?'y':''}"><b>${x.l.b[0]}</b><small>${x.l.b[1]}</small></span></div><div class="small" style="margin-top:8px">${x.on?'<b style="color:var(--review)">Both present.</b> ':x.a||x.b?'<b style="color:#a37200">One side present.</b> ':''}${x.l.note}</div></div>`).join('')}</div>`;}
+const TK=['CK','HSCRP','TC','FER','TSAT','USG','FT3','VITD','HB','TEST','MG'];
+function chart(p,i,k){const pts=p.rep.slice(0,i+1).map((r,j)=>({d:r.d,v:raw(p,j,k)})).filter(x=>x.v!=null);const pr=project(p,i,k);const b=base(p,i,k);
+  const W=820,H=260,pl=52,prr=24,pt=16,pb=30;const t0=days(p.rep[0].d),t1=days(p.rep[0].d)+170;const X=t=>pl+(t-t0)/(t1-t0)*(W-pl-prr);
+  const vs=pts.map(x=>x.v);if(pr)vs.push(pr.next);if(b!=null)vs.push(b);const th=THR[k]&&THR[k][0];if(th!=null)vs.push(th);
+  let lo=Math.min(...vs),hi=Math.max(...vs);const pad=(hi-lo)*.18||Math.abs(hi)*.1||1;lo=k==='USG'?lo-pad:Math.max(0,lo-pad);hi+=pad;const Y=v=>pt+(1-(v-lo)/(hi-lo))*(H-pt-pb);
+  let g='';for(let j=0;j<=4;j++){const v=lo+(hi-lo)*j/4;g+=`<line class="gl" x1="${pl}" x2="${W-prr}" y1="${Y(v)}" y2="${Y(v)}"/><text class="ax" x="${pl-6}" y="${Y(v)+4}" text-anchor="end">${fmt(k,v)}</text>`;}
+  p.rep.forEach(r=>g+=`<text class="ax" x="${X(days(r.d))}" y="${H-8}" text-anchor="middle">${r.d.slice(5)}</text>`);
+  if(th!=null)g+=`<line class="thr" x1="${pl}" x2="${W-prr}" y1="${Y(th)}" y2="${Y(th)}"/><text class="ax" x="${W-prr}" y="${Y(th)-5}" text-anchor="end" style="fill:var(--review)">signal line ${fmt(k,th)}</text>`;
+  if(b!=null)g+=`<line class="bl" x1="${pl}" x2="${W-prr}" y1="${Y(b)}" y2="${Y(b)}"/><text class="ax" x="${pl+4}" y="${Y(b)-5}">personal baseline ${fmt(k,b)}</text>`;
+  const line=pts.map(x=>X(days(x.d)).toFixed(1)+','+Y(x.v).toFixed(1)).join(' ');const e=pts.at(-1);
+  if(pr)g+=`<line class="pr" x1="${X(days(e.d))}" y1="${Y(e.v)}" x2="${X(pr.t)}" y2="${Y(pr.next)}"/><circle class="pp" cx="${X(pr.t)}" cy="${Y(pr.next)}" r="4.5"><title>Projected ${fmt(k,pr.next)}</title></circle><text class="ax" x="${X(pr.t)}" y="${Y(pr.next)-9}" text-anchor="middle" style="fill:var(--review)">+4 wk ${fmt(k,pr.next)}</text>`;
+  return `<svg class="ch" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${M[k].full} over the season">${g}<polyline class="ln" points="${line}"/>${pts.map(x=>`<circle class="pt" cx="${X(days(x.d))}" cy="${Y(x.v)}" r="4"><title>${x.d}: ${fmt(k,x.v)}</title></circle>`).join('')}</svg>`;}
+function tTrend(p,i){const k=state.chartK;const pr=project(p,i,k),w=weeksTo(p,i,k),d=dev(p,i,k);const th=THR[k];
+  return `<div class="card"><div class="selrow" role="group" aria-label="Marker">${TK.map(m=>`<button class="pill" data-ck="${m}" aria-pressed="${m===k}">${M[m].n}</button>`).join('')}</div>
+  <h3 style="margin-top:14px">${M[k].full}</h3><div class="sub">${M[k].u} · solid line: results so far · dashed line: projection to the next round (+4 weeks)</div>${chart(p,i,k)}
+  <div class="grid g3" style="margin-top:6px"><div class="proj"><span class="small">Now vs personal baseline</span><b class="dev ${d==null?'flat':d>0?'up':'down'}" style="font-size:20px">${sgn(d)}</b></div>
+  <div class="proj"><span class="small">Projected next round</span><b style="font-size:20px" class="num">${pr?fmt(k,pr.next)+' '+M[k].u:'needs 3 rounds'}</b></div>
+  <div class="proj"><span class="small">${th&&th[0]!=null?`Time to signal line (${th[1]} ${fmt(k,th[0])})`:'Signal line'}</span><b style="font-size:20px">${th&&th[0]!=null?(w===0?'already past it':w?`about ${w} weeks`:'not on current trend'):'by % change'}</b></div></div>
+  <p class="small" style="margin-top:10px">Projections are a straight-line trend from the last three rounds, to help staff plan the next test. They are not a prediction of injury for this player.</p></div>`;}
+function tReport(p,i,sm){const fl=Object.keys(M).map(k=>({k,t:tier(p,i,k),v:raw(p,i,k)})).filter(x=>flagged(x.t.s));
+  const det=SENT.filter(s=>sm.S[s.id].state==='detected'),wat=SENT.filter(s=>sm.S[s.id].state==='watch');
+  const projs=TK.map(k=>({k,w:weeksTo(p,i,k)})).filter(x=>x.w&&x.w>0);
+  const act=[];if(sm.S.OVER.state!=='clear'&&sm.S.OVER.state!=='insufficient')act.push('Review training load and recovery days with the performance staff.');if(sm.S.IRON.state!=='clear')act.push('Nutrition review for iron intake; consider a repeat iron panel.');if(sm.S.HEAT.state!=='clear')act.push('Check hydration routine around heat sessions; repeat urine specific gravity before the next session.');if(sm.S.ENERGY.state!=='clear')act.push('Review energy intake against training load with the nutritionist.');if(sm.S.BONE.state!=='clear')act.push('Vitamin D and bone-health review with the medical team.');if(sm.S.MUSCLE.state!=='clear')act.push('Repeat CK on a rested day before the next high-intensity block.');if(sm.S.ILL.state!=='clear')act.push('Medical check for current or recent illness.');
+  return `<div class="card rep"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><h3>Staff report · ${p.id}</h3><div class="small">${p.pos} · Round ${i+1} · ${p.rep[i].d} · ${p.rep[i].phase} · ${p.rep[i].ctx.timing}</div></div>${stChip(sm.status)}</div>
+  ${sm.g2.fired.length?`<div class="sec"><b style="color:var(--medical)">Safety alert first:</b> ${sm.g2.fired.map(x=>x.g.lab+' ('+x.g.why+')').join('; ')}.</div>`:''}
+  <div class="sec"><b>Summary.</b> ${det.length?`${det.length} sentinel${det.length>1?'s':''} detected (${det.map(s=>s.n).join(', ')})`:'No sentinel detected'}${wat.length?`; on watch: ${wat.map(s=>s.n).join(', ')}`:''}. ${fl.length} of ${Object.keys(M).length} markers outside range or flagged against the player’s own baseline.</div>
+  ${sm.pats.some(x=>x.on)?`<div class="sec"><b>Patterns to discuss</b><ul>${sm.pats.filter(x=>x.on).map(x=>`<li>${x.pt.n}: ${x.met} of ${x.pt.crit.length} criteria met.</li>`).join('')}</ul></div>`:''}
+  ${fl.length?`<div class="sec"><b>Markers flagged</b><ul>${fl.map(x=>`<li>${M[x.k].full}: ${fmt(x.k,x.v)} ${M[x.k].u} (${x.t.lab.toLowerCase()}${dev(p,i,x.k)!=null?', '+sgn(dev(p,i,x.k))+' vs baseline':''})</li>`).join('')}</ul></div>`:''}
+  ${projs.length?`<div class="sec"><b>Trends heading toward a signal line</b><ul>${projs.map(x=>`<li>${M[x.k].full}: about ${x.w} weeks on the current trend.</li>`).join('')}</ul></div>`:''}
+  <div class="sec"><b>Suggested staff actions</b><ul>${(act.length?act:['No action beyond routine monitoring.']).map(a=>`<li>${a}</li>`).join('')}</ul></div>
+  <div class="sec small">Burak supports staff decisions. It does not diagnose, clear a player to play, or predict an individual injury. Illustrative data.</div></div>`;}
+function vSeason(){const k=state.trendK;const rounds=P[0].rep.map((r,i)=>({r,A:P.map(p=>summary(p,i))}));
+  const bars=rounds.map(x=>({d:x.r.d,ph:x.r.phase,c:{clear:x.A.filter(s=>s.status==='clear').length,monitor:x.A.filter(s=>s.status==='monitor').length,review:x.A.filter(s=>s.status==='review').length,medical:x.A.filter(s=>s.status==='medical').length}}));
+  const W=820,H=240,pl=36,pb=40,pt=12;const bw=(W-pl-20)/bars.length*.55;const Y=v=>pt+(1-v/P.length)*(H-pt-pb);
+  let g='';[0,7,14].forEach(v=>g+=`<line class="gl" x1="${pl}" x2="${W-10}" y1="${Y(v)}" y2="${Y(v)}"/><text class="ax" x="${pl-6}" y="${Y(v)+4}" text-anchor="end">${v}</text>`);
+  bars.forEach((b,i)=>{const x=pl+(i+.5)*(W-pl-20)/bars.length-bw/2;let acc=0;[['clear','#1f9d6a'],['monitor','#d39b0c'],['review','#e0523d'],['medical','#8f1d2c']].forEach(([s,c])=>{const v=b.c[s];if(v){g+=`<rect x="${x}" y="${Y(acc+v)}" width="${bw}" height="${Y(acc)-Y(acc+v)}" fill="${c}"><title>${STATUS[s][1]}: ${v}</title></rect>`;}acc+=v;});
+   g+=`<text class="ax" x="${x+bw/2}" y="${H-22}" text-anchor="middle">${b.d.slice(5)}</text><text class="ax" x="${x+bw/2}" y="${H-8}" text-anchor="middle">${b.ph.replace('Pre-season heat camp','Heat camp')}</text>`;});
+  const sentRows=SENT.map(s=>`<tr><td><b>${s.n}</b></td>${rounds.map(x=>{const n=x.A.filter(a=>a.S[s.id].state==='detected').length;return `<td style="text-align:center"><span class="num" style="display:inline-block;min-width:30px;border-radius:6px;padding:3px 6px;background:${n?`rgba(224,82,61,${.15+n/P.length*1.4})`:'#eef4f1'};color:${n>2?'#fff':'var(--ink)'};font-weight:700">${n}</span></td>`;}).join('')}</tr>`).join('');
+  return `<div class="card"><h3>Squad status across the season</h3><div class="sub">Players in each status at every test round</div><svg class="ch" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Squad status by round">${g}</svg>
+   <div class="legend"><span><i style="background:#1f9d6a"></i>Clear</span><span><i style="background:#d39b0c"></i>Monitor</span><span><i style="background:#e0523d"></i>Staff review</span><span><i style="background:#8f1d2c"></i>Medical review</span></div></div>
+  <div class="card"><h3>Sentinels detected per round</h3><div class="sub">Number of players · the heat camp and congested fixtures stand out</div><div class="tw"><table><thead><tr><th>Sentinel</th>${rounds.map(x=>`<th style="text-align:center">${x.r.d.slice(5)}<div class="small" style="text-transform:none;letter-spacing:0">${x.r.phase}</div></th>`).join('')}</tr></thead><tbody>${sentRows}</tbody></table></div></div>
+  <div class="card"><h3>Every player on one marker</h3><div class="selrow" role="group" aria-label="Marker" style="margin-top:8px">${TK.map(m=>`<button class="pill" data-tk="${m}" aria-pressed="${m===k}">${M[m].n}</button>`).join('')}</div>${multi(k)}</div>`;}
+function multi(k){const W=820,H=280,pl=52,pr=110,pt=14,pb=26;const all=P.flatMap(p=>p.rep.map((_,i)=>raw(p,i,k))).filter(v=>v!=null);let lo=Math.min(...all),hi=Math.max(...all);if(k==='CK'){hi=Math.min(hi,6000);}const pad=(hi-lo)*.08;lo=k==='USG'?lo-pad:Math.max(0,lo-pad);hi+=pad;
+  const X=i=>pl+i/4*(W-pl-pr),Y=v=>pt+(1-(Math.min(v,hi)-lo)/(hi-lo))*(H-pt-pb);let g='';for(let j=0;j<=4;j++){const v=lo+(hi-lo)*j/4;g+=`<line class="gl" x1="${pl}" x2="${W-pr}" y1="${Y(v)}" y2="${Y(v)}"/><text class="ax" x="${pl-6}" y="${Y(v)+4}" text-anchor="end">${fmt(k,v)}</text>`;}
+  P[0].rep.forEach((r,i)=>g+=`<text class="ax" x="${X(i)}" y="${H-6}" text-anchor="middle">${r.d.slice(5)}</text>`);
+  const th=THR[k]&&THR[k][0];if(th!=null&&th>=lo&&th<=hi)g+=`<line class="thr" x1="${pl}" x2="${W-pr}" y1="${Y(th)}" y2="${Y(th)}"/>`;
+  const fl=P.map(p=>({p,f:flagged(tier(p,LAST,k).s)}));
+  const labs=[];fl.forEach(({p,f})=>{const pts=p.rep.map((_,i)=>[X(i),Y(raw(p,i,k))]);g+=`<polyline fill="none" stroke="${f?'#e0523d':'#a9c4b9'}" stroke-width="${f?2.6:1.4}" points="${pts.map(x=>x.join(',')).join(' ')}"><title>${p.id}</title></polyline>`;if(f)labs.push([pts[4][1],p.id]);});
+  labs.sort((a,b)=>a[0]-b[0]);let last=-99;labs.forEach(l=>{const y=Math.max(l[0],last+13);last=y;g+=`<text class="ax" x="${W-pr+6}" y="${y+4}" style="fill:#a5291b;font-weight:700">${l[1]}</text>`;});
+  return `<svg class="ch" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${M[k].full} by player">${g}</svg><div class="small">${M[k].full} (${M[k].u}). Red lines: players flagged at the latest round.${k==='CK'?' Axis capped at 6,000 U/L; the August safety alert is off the scale.':''}</div>`;}
+function vMethod(){return `<div class="card"><h3>The Burak pipeline for a football squad</h3><div class="sub">The same framework Burak uses in clinical screening, tuned for elite football and Qatar’s heat</div>
+  <div class="steps" style="margin-top:12px">
+   <div class="step"><b>1 · Data in</b><span>Routine blood and urine tests at each round, plus match minutes, heat sessions and body mass.</span></div>
+   <div class="step g"><b>2 · Gate 2 first</b><span>Safety checks such as very high CK or sodium disturbance go straight to the medical team.</span></div>
+   <div class="step"><b>3 · Gate 1</b><span>A label on baseline markers. It never stops the analysis.</span></div>
+   <div class="step"><b>4 · Marker profile</b><span>Eight biological lines, each result against its range and the player’s own baseline.</span></div>
+   <div class="step"><b>5 · Sentinels</b><span>Seven early-warning checks; each fires when 2 of 3 markers are out of line.</span></div>
+   <div class="step"><b>6 · Patterns</b><span>Named patterns such as overreaching or iron deficiency, shown as criteria met.</span></div>
+   <div class="step"><b>7 · Links & trends</b><span>Signals across body systems, change against baseline and a 4-week trend projection.</span></div>
+   <div class="step"><b>8 · Staff report</b><span>Safety first, then signals, patterns and suggested staff actions.</span></div></div></div>
+  <div class="grid g2"><div class="card"><h3>Why this matters in Qatar</h3><ul style="padding-left:18px;margin:8px 0 0">
+   <li><b>Heat.</b> Summer pre-season and training in heat raise the risk of under-hydration and muscle breakdown, so hydration markers and CK sit at the front.</li>
+   <li><b>Vitamin D.</b> Low vitamin D is common in the Gulf despite the sun, and matters for bone and muscle.</li>
+   <li><b>Ramadan.</b> Fasting changes hydration, energy intake and sleep; the workspace can tag fasting rounds so they are read in context.</li>
+   <li><b>Congested fixtures.</b> Domestic, regional and international matches stack up; overreaching and recovery signals are tracked through those blocks.</li></ul></div>
+  <div class="card"><h3>What Burak does and does not do</h3><ul style="padding-left:18px;margin:8px 0 0">
+   <li>Compares each player with his own baseline, not only with population ranges.</li>
+   <li>Explains every signal: the marker, the threshold and the change.</li>
+   <li>Each club has its own workspace, ranges and rules, set with its medical team.</li>
+   <li><b>Does not</b> diagnose, clear a player to play, or predict an individual injury. Staff decide.</li></ul></div></div>
+  <div class="card"><h3>Published basis for the markers and rules</h3><div class="sub">Thresholds in this demo are illustrative until reviewed by a club’s medical team</div><ul style="padding-left:18px;margin:10px 0 0">
+   <li>Lee EC et al. Biomarkers in sports and exercise: tracking health, performance, and recovery in athletes. J Strength Cond Res 2017;31:2920–2937.</li>
+   <li>Meeusen R et al. Prevention, diagnosis and treatment of the overtraining syndrome: joint consensus statement of the ECSS and ACSM. Med Sci Sports Exerc 2013;45:186–205.</li>
+   <li>Mountjoy M et al. 2023 IOC consensus statement on Relative Energy Deficiency in Sport (REDs). Br J Sports Med 2023;57:1073–1097.</li>
+   <li>Racinais S et al. Consensus recommendations on training and competing in the heat. Scand J Med Sci Sports 2015;25(Suppl 1):6–19.</li>
+   <li>Mougios V. Reference intervals for serum creatine kinase in athletes. Br J Sports Med 2007;41:674–678.</li>
+   <li>Sim M et al. Iron considerations for the athlete: a narrative review. Eur J Appl Physiol 2019;119:1463–1478.</li></ul></div>`;}
+
+/* ======================= EVENTS ======================= */
+document.addEventListener('click',e=>{const t=e.target.closest('button,[data-open]');if(!t)return;
+  if(t.dataset.nav){state.view=t.dataset.nav;render();window.scrollTo(0,0);return;}
+  if(t.dataset.open!=null){openPlayer(+t.dataset.open);return;}
+  if(t.dataset.tab){state.tab=t.dataset.tab;render();return;}
+  if(t.dataset.round!=null){state.ri=+t.dataset.round;render();return;}
+  if(t.dataset.filter){state.filter=t.dataset.filter;render();return;}
+  if(t.dataset.ck){state.chartK=t.dataset.ck;render();return;}
+  if(t.dataset.tk){state.trendK=t.dataset.tk;render();return;}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'){const r=e.target.closest&&e.target.closest('[data-open]');if(r)openPlayer(+r.dataset.open);}if(e.key==='Escape'&&!$('about').hidden)$('about').hidden=true;});
+document.addEventListener('change',e=>{if(e.target.id==='psel'){state.pi=+e.target.value;state.ri=LAST;render();}if(e.target.id==='rsel'){state.ri=+e.target.value;render();}});
+function openPlayer(i){state.pi=i;state.ri=LAST;state.view='player';state.tab='overview';render();window.scrollTo(0,0);}
+(function(){const m=$('about');const close=()=>{m.hidden=true;try{sessionStorage.setItem('burak-fb-about','1');}catch(e){}};$('aboutOk').onclick=close;$('aboutBtn').onclick=()=>{m.hidden=false;$('aboutOk').focus();};m.addEventListener('click',e=>{if(e.target===m)close();});
+  let seen=false;try{seen=sessionStorage.getItem('burak-fb-about')==='1';}catch(e){}if(!seen)m.hidden=false;})();
 render();
 </script>
-
-</body>
-</html>
+</body></html>
